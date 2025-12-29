@@ -234,33 +234,19 @@
         /* 修改：聊天气泡最大宽度 */
         .message-container {
             display: flex;
-            align-items: flex-end;
             margin-bottom: 12px;
-            width: 100%;
+            max-width: 85%;
         }
 
-        /* 消息行统一结构 */
-        .message-container {
-            display: flex;
-            align-items: flex-end;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-
-        /* 对方消息：头像在左，气泡在右 */
-        .bot-container {
-            justify-content: flex-start;
-            padding-left: 16px;
-            padding-right: 48px;
-            /* 给气泡最大宽度留空间，和右侧对称 */
-        }
-
-        /* 用户消息：气泡在左，头像在右 */
         .user-container {
+            margin-left: auto;
+            margin-right: 15px;
             justify-content: flex-end;
-            padding-right: 16px;
-            padding-left: 48px;
-            /* 与 bot 对称，保证页边距一致 */
+        }
+
+        .bot-container {
+            margin-right: auto;
+            margin-left: 15px;
         }
 
         /* 修改：气泡内边距和文字大小 */
@@ -273,7 +259,6 @@
             line-height: 1.4;
             max-width: 100%;
             word-wrap: break-word;
-            max-width: 72%;
         }
 
         @keyframes fadeIn {
@@ -336,7 +321,7 @@
             right: 0;
             bottom: 0;
 
-            height: 94px;
+            height: 88px;
             /* ✅ 保持你现在拉高的高度 */
 
             box-shadow:
@@ -417,48 +402,6 @@
         .sticker-btn:hover,
         .image-btn:hover {
             background-color: rgba(255, 182, 193, 0.1);
-        }
-
-        /* 聊天列表头像 */
-        .chat-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            flex-shrink: 0;
-
-            background: rgba(255, 255, 255, 0.8);
-            color: #1c1c1e;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 13px;
-            font-weight: 600;
-
-            overflow: hidden;
-        }
-
-        /* 头像图片 */
-        .chat-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* 布局调整（最终稳定版） */
-        .bot-container {
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            padding-left: 12px;
-        }
-
-        .user-container {
-            display: flex;
-            align-items: flex-end;
-            gap: 8px;
-            padding-right: 12px;
         }
 
         /* 设置面板 - 修改：全屏白色背景 */
@@ -2110,17 +2053,6 @@
                     <input type="text" class="glass-input" id="userNameInput" placeholder="输入您的名称">
                 </div>
 
-                <div class="setting-section">
-                    <h3>用户头像设置</h3>
-
-                    <div class="avatar-preview">
-                        <div class="avatar" id="userAvatarPreview">我</div>
-                    </div>
-
-                    <input type="file" id="userAvatarFileInput" class="hidden-file-input" accept="image/*">
-                    <button class="capsule-btn" id="uploadUserAvatarBtn">从本地导入头像</button>
-                </div>
-
                 <!-- 对方名称 -->
                 <div class="setting-section">
                     <h3>对方名称</h3>
@@ -2363,7 +2295,6 @@
         let appData = {
             currentFriendId: "friend1",
             userName: "用户",
-            userAvatarImage: null, // 👈 新增
             userStickers: [],
             friends: {
                 "friend1": {
@@ -2455,24 +2386,6 @@
         let currentSelectedMessage = null;
 
         // 头像设置相关元素
-        const userAvatarPreview = document.getElementById('userAvatarPreview');
-        const userAvatarFileInput = document.getElementById('userAvatarFileInput');
-        const uploadUserAvatarBtn = document.getElementById('uploadUserAvatarBtn');
-        uploadUserAvatarBtn.addEventListener('click', () => {
-            userAvatarFileInput.click();
-        });
-
-        userAvatarFileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const compressed = await compressAvatar(file);
-            appData.userAvatarImage = compressed;
-
-            await saveData();
-            renderSettings();
-            renderChat();
-        });
         const avatarFileInput = document.getElementById('avatarFileInput');
         const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
         const avatarPreview = document.getElementById('avatarPreview');
@@ -2992,40 +2905,10 @@
                 const messageContainer = document.createElement('div');
                 messageContainer.className = `message-container ${msg.sender}-container`;
 
-                // 创建头像
-                const avatar = document.createElement('div');
-                avatar.className = 'chat-avatar';
-
-                if (msg.sender === 'user') {
-                    if (appData.userAvatarImage) {
-                        avatar.innerHTML = `<img src="${appData.userAvatarImage}">`;
-                    } else {
-                        avatar.textContent = appData.userName.charAt(0);
-                    }
-                } else {
-                    const friend = getCurrentFriend();
-                    if (friend.avatarImage) {
-                        avatar.innerHTML = `<img src="${friend.avatarImage}">`;
-                    } else {
-                        avatar.textContent = friend.avatar || friend.name.charAt(0);
-                    }
-                }
-
-                // 创建消息气泡
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `message ${msg.sender}-message`;
                 messageDiv.setAttribute('data-message-id', index);
 
-                // 根据发送者决定 DOM 顺序
-                if (msg.sender === 'user') {
-                    // 用户消息：气泡在左，头像在右
-                    messageContainer.appendChild(messageDiv);
-                    messageContainer.appendChild(avatar);
-                } else {
-                    // 对方消息：头像在左，气泡在右
-                    messageContainer.appendChild(avatar);
-                    messageContainer.appendChild(messageDiv);
-                }
                 // 如果有引用，显示引用气泡
                 if (msg.quote) {
                     const messageWithQuote = document.createElement('div');
@@ -3087,6 +2970,7 @@
                 // 添加点击事件监听
                 messageDiv.addEventListener('click', handleMessageClick);
 
+                messageContainer.appendChild(messageDiv);
                 chatArea.appendChild(messageContainer);
             });
 
@@ -3137,38 +3021,18 @@
             return `${year}年${month}月${day}日`;
         }
 
-        function renderAvatar(el, image, fallbackText) {
-            if (!el) return;
-
-            if (image) {
-                el.innerHTML = `<img src="${image}" style="
-            width:100%;
-            height:100%;
-            border-radius:50%;
-            object-fit:cover;
-        ">`;
-            } else {
-                el.innerHTML = '';
-                el.textContent = fallbackText || '';
-            }
-        }
         // 渲染设置界面
         function renderSettings() {
             const currentFriend = getCurrentFriend();
 
             botNameElement.textContent = currentFriend.name;
-            // 用户头像预览
-            renderAvatar(
-                userAvatarPreview,
-                appData.userAvatarImage,
-                appData.userName.charAt(0)
-            );
-            // ===== 角色头像（替换你原来的 if else）=====
-            renderAvatar(
-                botAvatar,
-                currentFriend.avatarImage,
-                currentFriend.avatar || currentFriend.name.charAt(0)
-            );
+
+            // 更新头像显示
+            if (currentFriend.avatarImage) {
+                botAvatar.innerHTML = `<img src="${currentFriend.avatarImage}" style="width: 100%; height: 100%; border-radius: 50%;">`;
+            } else {
+                botAvatar.textContent = currentFriend.avatar || currentFriend.name.charAt(0);
+            }
 
             botNameInput.value = currentFriend.name;
             userNameInput.value = appData.userName;
@@ -3177,12 +3041,12 @@
             quoteReplyToggle.checked = currentFriend.settings.enableQuoteReply;
             useCustomBackgroundToggle.checked = currentFriend.useCustomBackground;
 
-            // 角色头像预览
-            renderAvatar(
-                avatarPreview,
-                currentFriend.avatarImage,
-                currentFriend.avatar || currentFriend.name.charAt(0)
-            );
+            // 更新头像预览
+            if (currentFriend.avatarImage) {
+                avatarPreview.innerHTML = `<img src="${currentFriend.avatarImage}" style="width: 100%; height: 100%; border-radius: 50%;">`;
+            } else {
+                avatarPreview.textContent = currentFriend.avatar || currentFriend.name.charAt(0);
+            }
 
             // 更新背景预览
             if (currentFriend.backgroundImage) {
@@ -3484,31 +3348,8 @@
             const messageContainer = document.createElement('div');
             messageContainer.className = `message-container ${msg.sender}-container`;
 
-            // 创建头像
-            const avatar = document.createElement('div');
-            avatar.className = 'chat-avatar';
-
-            if (msg.sender === 'user') {
-                if (appData.userAvatarImage) {
-                    avatar.innerHTML = `<img src="${appData.userAvatarImage}">`;
-                } else {
-                    avatar.textContent = appData.userName.charAt(0);
-                }
-            } else {
-                const friend = getCurrentFriend();
-                if (friend.avatarImage) {
-                    avatar.innerHTML = `<img src="${friend.avatarImage}">`;
-                } else {
-                    avatar.textContent = friend.avatar || friend.name.charAt(0);
-                }
-            }
-
-            // 创建消息气泡
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${msg.sender}-message`;
-
-            // 插入顺序
-            messageContainer.appendChild(avatar);
 
             // 如果有引用，显示引用气泡
             if (msg.quote) {
@@ -3571,6 +3412,7 @@
             // 添加点击事件监听
             messageDiv.addEventListener('click', handleMessageClick);
 
+            messageContainer.appendChild(messageDiv);
             chatArea.appendChild(messageContainer);
 
             // 确保滚动到底部
@@ -3581,19 +3423,8 @@
 
         // 调整文本区域高度
         function adjustTextareaHeight() {
-            const el = messageInput;
-
-            // 先重置高度
-            el.style.height = 'auto';
-
-            const newHeight = Math.min(el.scrollHeight, 96); // 最大高度和 CSS 保持一致
-            const oldHeight = el.offsetHeight;
-
-            el.style.height = newHeight + 'px';
-
-            // 核心：高度变化的一半，用来做中心偏移
-            const delta = newHeight - oldHeight;
-            el.style.transform = `translateY(${-delta / 2}px)`;
+            messageInput.style.height = 'auto';
+            messageInput.style.height = (messageInput.scrollHeight) + 'px';
         }
 
         // 清除所有聊天记录
