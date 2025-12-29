@@ -103,39 +103,24 @@
             background-repeat: repeat;
         }
 
-        .chat-header,
-        .chat-area,
-        .input-area {
-            position: relative;
-            z-index: 1;
-        }
 
         /* 头部区域 - 优化的毛玻璃效果 */
-        /* 顶部 Header - 韩系 INS · iOS 悬浮毛玻璃 */
         .header {
-            height: 70px;
+            background-color: rgba(255, 255, 255, 0.05);
             padding: 15px 18px;
-
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-shrink: 0;
-
-            /* 核心：雾白悬浮玻璃 */
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-
-            /* 只保留一个非常轻的阴影 */
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-
-            /* 不要卡片感 */
-            border: none;
-            border-radius: 0;
-
-            /* 层级 */
+            border-bottom: 1px solid rgba(237, 237, 237, 0.3);
             position: relative;
-            z-index: 1;
+            z-index: 10;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1),
+                inset 0 0 20px rgba(255, 255, 255, 0.3);
+            height: 70px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 0 0 9px 9px;
         }
 
         .header-left {
@@ -235,14 +220,6 @@
             opacity: 0.9;
         }
 
-        /* 雾白覆盖层 */
-        .chat-bg::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(245, 246, 248, 0.65);
-        }
-
         .chat-area {
             flex: 1;
             padding: 12px;
@@ -325,59 +302,37 @@
             z-index: 2;
         }
 
-
-        /* 底部输入区域 - 韩系 INS · iOS 悬浮玻璃 */
+        /* 输入区域（底部输入框容器） */
+        /* 输入区域 */
         .input-area {
+            display: flex;
+            align-items: flex-start;
+            /* ✅ 关键：从 center 改成 flex-start */
+
+            padding: 12px 15px;
+            padding-top: 20px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+
+            background-color: rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(237, 237, 237, 0.3);
+
             position: fixed;
             left: 0;
             right: 0;
             bottom: 0;
 
-            padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+            height: 88px;
+            /* ✅ 保持你现在拉高的高度 */
 
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
+            box-shadow:
+                0 -4px 15px rgba(0, 0, 0, 0.1),
+                inset 0 0 20px rgba(255, 255, 255, 0.3);
 
-            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
 
-            z-index: 1;
-        }
-
-        .input-inner {
-            display: flex;
-            align-items: flex-end;
-            gap: 10px;
-
-            padding: 6px 10px;
-
-            background: transparent;
-            border-radius: 0;
-            box-shadow: none;
-        }
-
-        .message-input {
-            flex: 1;
-            resize: none;
-            border: none;
-            outline: none;
-
-            background: rgba(240, 240, 240, 0.8);
-            border-radius: 16px;
-
-            padding: 8px 12px;
-            font-size: 15px;
-            line-height: 1.5;
-
-            max-height: 120px;
-        }
-
-        .input-inner button {
-            border: none;
-            background: transparent;
-            padding: 6px;
-            border-radius: 50%;
-            cursor: pointer;
+            border-radius: 9px 9px 0 0;
+            flex-shrink: 0;
         }
 
         .message-input {
@@ -2019,24 +1974,15 @@
         </div>
 
         <div class="input-area">
-            <div class="input-inner">
-
-                <button class="sticker-btn">
-                    <div class="smile-icon"></div>
-                </button>
-
-                <button class="image-btn">
-                    <div class="link-icon"></div>
-                </button>
-
-                <input type="file" id="imageFileInput" class="hidden-file-input">
-
-                <textarea class="message-input" id="messageInput" placeholder="输入消息...">
-        </textarea>
-
-                <button class="send-btn" id="sendBtn"></button>
-
-            </div>
+            <button class="sticker-btn">
+                <div class="smile-icon"></div>
+            </button>
+            <button class="image-btn">
+                <div class="link-icon"></div>
+            </button>
+            <input type="file" id="imageFileInput" class="hidden-file-input" accept="image/*">
+            <textarea class="message-input" placeholder="输入消息..." id="messageInput" rows="1"></textarea>
+            <button class="send-btn" id="sendBtn">➤</button>
         </div>
 
         <!-- 其余HTML内容保持不变 -->
