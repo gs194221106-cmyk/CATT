@@ -325,36 +325,56 @@
             z-index: 2;
         }
 
-        /* 输入区域（底部输入框容器） */
+
         /* 底部输入区域 - 韩系 INS · iOS 悬浮玻璃 */
         .input-area {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+            background: transparent;
+
+            z-index: 1;
+        }
+
+        .input-inner {
             display: flex;
-            align-items: flex-start;
+            align-items: flex-end;
+            gap: 10px;
 
-            padding: 14px 16px;
-            padding-bottom: calc(14px + env(safe-area-inset-bottom));
+            padding: 10px 14px;
 
-            /* 悬浮玻璃核心 */
-            background: rgba(255, 255, 255, 0.78);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
 
-            /* 只保留轻阴影 */
-            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08);
+            border-radius: 26px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
 
-            /* 不要卡片感 */
+        .message-input {
+            flex: 1;
+
+            resize: none;
             border: none;
-            border-radius: 22px;
+            outline: none;
+            background: transparent;
 
-            position: fixeSd;
-            left: 16px;
-            right: 16px;
-            bottom: 14px;
+            font-size: 15px;
+            line-height: 1.5;
+            padding: 6px 0;
 
-            height: auto;
-            flex-shrink: 0;
+            max-height: 120px;
+        }
 
-            z-index: 1;
+        .input-inner button {
+            border: none;
+            background: transparent;
+            padding: 6px;
+            border-radius: 50%;
+            cursor: pointer;
         }
 
         .message-input {
@@ -1996,15 +2016,24 @@
         </div>
 
         <div class="input-area">
-            <button class="sticker-btn">
-                <div class="smile-icon"></div>
-            </button>
-            <button class="image-btn">
-                <div class="link-icon"></div>
-            </button>
-            <input type="file" id="imageFileInput" class="hidden-file-input" accept="image/*">
-            <textarea class="message-input" placeholder="输入消息..." id="messageInput" rows="1"></textarea>
-            <button class="send-btn" id="sendBtn">➤</button>
+            <div class="input-inner">
+
+                <button class="sticker-btn">
+                    <div class="smile-icon"></div>
+                </button>
+
+                <button class="image-btn">
+                    <div class="link-icon"></div>
+                </button>
+
+                <input type="file" id="imageFileInput" class="hidden-file-input">
+
+                <textarea class="message-input" id="messageInput" placeholder="输入消息...">
+        </textarea>
+
+                <button class="send-btn" id="sendBtn"></button>
+
+            </div>
         </div>
 
         <!-- 其余HTML内容保持不变 -->
