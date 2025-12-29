@@ -3423,8 +3423,19 @@
 
         // 调整文本区域高度
         function adjustTextareaHeight() {
-            messageInput.style.height = 'auto';
-            messageInput.style.height = (messageInput.scrollHeight) + 'px';
+            const el = messageInput;
+
+            // 先重置高度
+            el.style.height = 'auto';
+
+            const newHeight = Math.min(el.scrollHeight, 96); // 最大高度和 CSS 保持一致
+            const oldHeight = el.offsetHeight;
+
+            el.style.height = newHeight + 'px';
+
+            // 核心：高度变化的一半，用来做中心偏移
+            const delta = newHeight - oldHeight;
+            el.style.transform = `translateY(${-delta / 2}px)`;
         }
 
         // 清除所有聊天记录
