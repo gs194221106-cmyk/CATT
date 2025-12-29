@@ -333,8 +333,13 @@
             right: 0;
             bottom: 0;
 
-            padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
-            background: transparent;
+            padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
 
             z-index: 1;
         }
@@ -344,27 +349,25 @@
             align-items: flex-end;
             gap: 10px;
 
-            padding: 10px 14px;
+            padding: 6px 10px;
 
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-
-            border-radius: 26px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
         }
 
         .message-input {
             flex: 1;
-
             resize: none;
             border: none;
             outline: none;
-            background: transparent;
 
+            background: rgba(240, 240, 240, 0.8);
+            border-radius: 16px;
+
+            padding: 8px 12px;
             font-size: 15px;
             line-height: 1.5;
-            padding: 6px 0;
 
             max-height: 120px;
         }
