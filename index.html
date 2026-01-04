@@ -387,22 +387,24 @@
 
 
         /* ===== 输入行（悬浮卡片） ===== */
+        /* ===== 输入行（悬浮卡片，TOOL 的锚点） ===== */
         .input-btn {
             position: absolute;
+            /* ⭐ TOOL 的定位基准 */
             left: 0;
             right: 0;
 
             bottom: 69.67px;
-            /* ✅ 209 ÷ 3 */
+            /* 209 ÷ 3 */
 
             display: flex;
             align-items: center;
             gap: 14px;
 
             padding-left: 22px;
-            /* 语音按钮：66 ÷ 3 */
+            /* 66 ÷ 3 */
             padding-right: 31px;
-            /* 输入框：93 ÷ 3 */
+            /* 93 ÷ 3 */
         }
 
 
@@ -433,78 +435,83 @@
             stroke-linejoin: round;
         }
 
-
-        /* ===== 输入框主体（926 × 146 → ÷3） ===== */
-        .input-wrapper {
-            position: relative;
-            flex: 1;
-
-            height: 50px;
-            /* ✅ 150 ÷ 3 */
-            border-radius: 15px;
-            /* ✅ 45 ÷ 3 */
-
-            background: #ffffff;
-
-            box-shadow:
-                0 0 0.8px rgba(0, 0, 0, 0.03),
-                0 4px 14px rgba(0, 0, 0, 0.04);
-        }
-
-
-        /* ===== TOOL 标签（卡在中部） ===== */
+        /* ===== TOOL 标签（悬浮在输入框上方，不随多行变化） ===== */
         .tool-label {
             position: absolute;
+
             top: -6px;
-            /* 不动 */
-            left: 20px;
-            /* 不动 */
+            /* 保留你的设计值 */
+            left: 88px;
+            /* ≈ 语音按钮宽度 + gap（可微调） */
 
             font-family: "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif;
             font-weight: 500;
-            /* ≈ Medium */
             font-style: italic;
 
             font-size: 12px;
-            /* 视觉对应 28 ÷ 3 */
             line-height: 1;
             letter-spacing: 0.4px;
 
             color: #777;
             background: transparent;
 
+            z-index: 5;
             cursor: pointer;
             user-select: none;
         }
 
         .tool-arrow {
-            font-family: "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif;
-            font-weight: 500;
-            font-style: italic;
-
             font-size: 11px;
             line-height: 1;
         }
 
-        /* ===== 文本输入 ===== */
+
+        /* ===== 输入框主体（基于原始 50px） ===== */
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+
+            min-height: 50px;
+            /* 单行严格 50px */
+            max-height: 96px;
+            /* 三行封顶 */
+
+            border-radius: 15px;
+            background: #ffffff;
+
+            box-shadow:
+                0 0 0.8px rgba(0, 0, 0, 0.03),
+                0 4px 14px rgba(0, 0, 0, 0.04);
+
+            overflow: hidden;
+            /* ✅ 必须保留 */
+        }
+
+
+        /* ===== 文本输入（真多行 textarea） ===== */
         .message-input {
             width: 100%;
-            height: 100%;
+
+            min-height: 50px;
+            max-height: 96px;
 
             border: none;
             background: transparent;
 
-            padding: 0 40px 0 19px;
+            /* 用 padding 实现单行“视觉居中” */
+            padding: 16px 40px 16px 19px;
+
             font-size: 13px;
-            line-height: 48.67px;
-            /* ✅ 与输入框高度一致 */
+            line-height: 1.4;
 
             color: #333;
 
             resize: none;
             outline: none;
-        }
+            overflow-y: auto;
 
+            box-sizing: border-box;
+        }
 
         /* ===== 发送按钮 ===== */
         .send-btn {
@@ -2149,6 +2156,10 @@
         <div class="input-area">
 
             <div class="input-btn">
+                <!-- ⭐ TOOL 卡在“输入框”上 -->
+                <div class="tool-label">
+                    TOOL <span class="tool-arrow">^</span>
+                </div>
                 <!-- 语音 -->
                 <button class="voice-btn" type="button" aria-label="语音">
                     <svg class="voice-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -2160,11 +2171,6 @@
 
                 <!-- 输入框 -->
                 <div class="input-wrapper">
-
-                    <!-- ⭐ TOOL 卡在“输入框”上 -->
-                    <div class="tool-label">
-                        TOOL <span class="tool-arrow">^</span>
-                    </div>
 
                     <textarea class="message-input" id="messageInput" placeholder="输入消息..." rows="1"></textarea>
 
@@ -3611,22 +3617,26 @@
             }, 50);
         }
 
-        // 调整文本区域高度
+        const textarea = document.querySelector('.message-input');
+        const wrapper = document.querySelector('.input-wrapper');
+
+        const MIN_HEIGHT = 48.67; // 单行精确高度
+        const MAX_HEIGHT = 92;    // 三行封顶高度
+
         function adjustTextareaHeight() {
-            const el = messageInput;
+            textarea.style.height = 'auto';
 
-            // 先重置高度
-            el.style.height = 'auto';
+            const contentHeight = Math.min(textarea.scrollHeight, MAX_HEIGHT);
 
-            const newHeight = Math.min(el.scrollHeight, 96); // 最大高度和 CSS 保持一致
-            const oldHeight = el.offsetHeight;
-
-            el.style.height = newHeight + 'px';
-
-            // 核心：高度变化的一半，用来做中心偏移
-            const delta = newHeight - oldHeight;
-            el.style.transform = `translateY(${-delta / 2}px)`;
+            textarea.style.height = contentHeight + 'px';
+            wrapper.style.height = Math.max(MIN_HEIGHT, contentHeight) + 'px';
         }
+
+        // 输入时调整高度
+        textarea.addEventListener('input', adjustTextareaHeight);
+
+        // 页面初始化时也跑一次（防止回填内容）
+        window.addEventListener('load', adjustTextareaHeight);
 
         // 清除所有聊天记录
         function clearChatHistory() {
