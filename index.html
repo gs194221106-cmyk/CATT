@@ -131,7 +131,9 @@
             /* 93 ÷ 3，头像到 header 左边距 */
             padding-right: 29px;
 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow:
+                0 0 0.8px rgba(0, 0, 0, 0.03),
+                0 4px 14px rgba(0, 0, 0, 0.04);
         }
 
         .header-left {
@@ -190,9 +192,9 @@
 
         /* 修改：角色状态字体大小 */
         .chat-status {
-            font-size: 10px;
+            font-size: 9px;
             /* ↓ 更轻 */
-            line-height: 1.2;
+            line-height: 1.3;
 
             color: var(--header-status-color);
             text-shadow: var(--header-text-shadow);
@@ -284,14 +286,12 @@
             z-index: 1;
 
             height: 100%;
-            /* 占满 chat-wrapper */
             overflow-y: auto;
-            /* 滚动只在这里 */
             -webkit-overflow-scrolling: touch;
 
             padding: 12px;
-            padding-bottom: 100px;
-            /* 给 input-card 让位 */
+            padding-bottom: 20px;
+            /* ✅ 比 100px 小一档 */
 
             background: transparent;
         }
@@ -439,21 +439,23 @@
             position: relative;
             flex: 1;
 
-            height: 48.67px;
-            /* ✅ 146 ÷ 3 */
+            height: 50px;
+            /* ✅ 150 ÷ 3 */
             border-radius: 15px;
             /* ✅ 45 ÷ 3 */
 
             background: #ffffff;
 
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+            box-shadow:
+                0 0 0.8px rgba(0, 0, 0, 0.03),
+                0 4px 14px rgba(0, 0, 0, 0.04);
         }
 
 
         /* ===== TOOL 标签（卡在中部） ===== */
         .tool-label {
             position: absolute;
-            top: -5px;
+            top: -6px;
             /* 不动 */
             left: 20px;
             /* 不动 */
@@ -492,8 +494,8 @@
             border: none;
             background: transparent;
 
-            padding: 0 40px 0 14px;
-            font-size: 14px;
+            padding: 0 40px 0 19px;
+            font-size: 13px;
             line-height: 48.67px;
             /* ✅ 与输入框高度一致 */
 
@@ -527,7 +529,7 @@
         .input-footer-label {
             position: fixed;
 
-            bottom: 30px;
+            bottom: 28px;
             /* ≈ 89 / 3，保留你的视觉定位 */
             left: 0;
             right: 0;
@@ -556,7 +558,7 @@
 
         /* 修改：输入栏placeholder字体大小 */
         .message-input::placeholder {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--wechat-time);
         }
 
