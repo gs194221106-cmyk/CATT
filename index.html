@@ -55,8 +55,6 @@
             --panel-height: 100vh;
             --panel-padding: 20px;
 
-            /* ===== 系统栏视觉高度（上下对称用） ===== */
-            --system-bar-visual-height: 88px;
         }
 
         /* 深色主题变量 - 调整为较浅的黑色 */
@@ -98,8 +96,8 @@
         /* 头部外壳 */
         .header-card {
             width: 100%;
-            height: var(--system-bar-visual-height);
-            /* 来自 :root */
+            height: 95.33px;
+            /* 154.33 - iPhone 15 顶部安全区 59 */
 
             background: #ffffff;
 
@@ -109,14 +107,16 @@
             flex-shrink: 0;
         }
 
-        /* 头部-状态栏 */
+        /* Header 内部悬浮卡片（不含系统状态栏） */
         .header {
-            height: 56px;
+            height: 72px;
+            /* 来自 Figma：216 ÷ 3 */
             margin: 16px;
-            /* 四周留白，制造“悬浮”空间 */
+            /* 四周悬浮留白（与你设计一致） */
 
             background: #ffffff;
-            border-radius: 16px;
+            border-radius: 15px;
+            /* 来自 Figma：45 ÷ 3 */
 
             display: flex;
             align-items: center;
@@ -124,8 +124,8 @@
 
             padding: 0 16px;
 
-            /* 真正的悬浮阴影 */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            /* 更贴近 iOS 的轻悬浮阴影 */
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
         }
 
         .header-left {
@@ -335,7 +335,7 @@
         .input-area {
             position: relative;
             width: 100%;
-            height: 96px;
+            height: 154.33px;
             /* 👈 这里，88 → 96 */
             background: #ffffff;
 
