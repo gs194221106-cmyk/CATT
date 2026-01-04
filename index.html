@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 
 <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -110,32 +111,26 @@
         /* 头部 - 角色状态栏（最终正确版，不再重复状态栏高度） */
         .header {
             position: absolute;
-
-            /* 精确空间归属（全部来自 Figma） */
             top: 0;
-            /* DOM 内容起点 */
             bottom: 22.67px;
-            /* header 底 → header-card 底 */
 
             left: 19.67px;
-            /* 左页边距：59 ÷ 3 */
             right: 19.67px;
-            /* 右页边距：59 ÷ 3 */
 
             height: 72px;
-            /* header 本体高度 */
 
             background: #ffffff;
             border-radius: 15px;
-            /* 45 ÷ 3 */
 
             display: flex;
             align-items: center;
             justify-content: space-between;
 
-            padding: 0 16px;
+            /* 关键：让内部从“真实内容起点”开始 */
+            padding-left: 31px;
+            /* 93 ÷ 3，头像到 header 左边距 */
+            padding-right: 29px;
 
-            /* 阴影保持不动 */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
@@ -143,7 +138,6 @@
             display: flex;
             align-items: center;
             flex: 1;
-            margin-left: 15px;
         }
 
         .avatar-container {
@@ -153,10 +147,12 @@
         }
 
         .avatar {
-            width: 38px;
-            /* ↓ 从 42 缩到 38 */
-            height: 38px;
+            width: 42.33px;
+            height: 42.33px;
+
             border-radius: 50%;
+            object-fit: cover;
+            /* 上传头像裁剪，不拉伸 */
 
             background-color: var(--light-pink);
 
@@ -168,13 +164,14 @@
             font-weight: 600;
             font-size: 15px;
 
-            margin-right: 8px;
+            margin-right: 11.33px;
         }
 
         .chat-info {
             display: flex;
             flex-direction: column;
             justify-content: center;
+            transform: translateY(0.73px);
         }
 
         /* 修改：角色名字字体大小和间距 */
@@ -210,28 +207,57 @@
 
         .settings-btn {
             position: relative;
+            overflow: visible;
 
-            width: 40px;
-            /* 原来 36 → 拉长 */
-            height: 32px;
+            width: 36px;
+            height: 28px;
 
-            background: #000000;
+            background: #000;
             border: none;
-            border-radius: 12px;
-            /* 更圆润一点 */
+            border-radius: 7px;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
-            cursor: default;
+            cursor: pointer;
+            z-index: 1;
         }
 
+        /* 爱心 */
         .settings-btn::before {
             content: "♥";
-            color: #ffffff;
+            color: #fff;
             font-size: 14px;
             line-height: 1;
+
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ↓↓↓ 真正“自然长出来”的尾巴 ↓↓↓ */
+        .settings-btn::after {
+            content: "";
+            position: absolute;
+
+            left: 50%;
+            bottom: -2px;
+            /* 吃进按钮一点 */
+
+            width: 12px;
+            height: 12px;
+
+            background: #000;
+
+            transform:
+                translateX(-50%) rotate(45deg);
+
+            border-radius: 3px;
+            /* ✅ 所有角都是真的圆 */
+
+            z-index: -1;
+            /* ✅ 必须在按钮下面 */
+            pointer-events: none;
         }
 
         .chat-wrapper {
@@ -362,23 +388,34 @@
 
         /* ===== 输入行（悬浮卡片） ===== */
         .input-btn {
+            position: absolute;
+            left: 0;
+            right: 0;
+
+            bottom: 69.67px;
+            /* ✅ 209 ÷ 3 */
+
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 14px;
 
-            width: 100%;
+            padding-left: 22px;
+            /* 语音按钮：66 ÷ 3 */
+            padding-right: 31px;
+            /* 输入框：93 ÷ 3 */
         }
 
-        /* ===== 语音按钮 ===== */
+
+        /* ===== 语音按钮（90 ÷ 3） ===== */
         .voice-btn {
-            width: 36px;
-            height: 36px;
+            width: 30px;
+            height: 30px;
 
             border-radius: 50%;
             border: none;
             padding: 0;
 
-            background: #ffffff;
+            background: #f2f2f2;
 
             display: flex;
             align-items: center;
@@ -396,40 +433,42 @@
             stroke-linejoin: round;
         }
 
-        .input-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-        }
 
-        /* 输入框整体（像一个胶囊） */
+        /* ===== 输入框主体（926 × 146 → ÷3） ===== */
         .input-wrapper {
             position: relative;
             flex: 1;
 
-            height: 42px;
-            /* ↓ 比 44 略扁 */
-            border-radius: 14px;
-            /* ❗不再是胶囊 */
+            height: 48.67px;
+            /* ✅ 146 ÷ 3 */
+            border-radius: 15px;
+            /* ✅ 45 ÷ 3 */
 
             background: #ffffff;
 
-            /* 示意图那种“贴着但不浮夸”的阴影 */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
         }
 
+
+        /* ===== TOOL 标签（卡在中部） ===== */
         .tool-label {
             position: absolute;
+            top: -5px;
+            /* 不动 */
+            left: 20px;
+            /* 不动 */
 
-            top: -4px;
-            /* 👈 卡在“消息输入框”上边缘 */
-            left: 16px;
+            font-family: "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 500;
+            /* ≈ Medium */
+            font-style: italic;
 
             font-size: 12px;
-            color: #777;
+            /* 视觉对应 28 ÷ 3 */
+            line-height: 1;
             letter-spacing: 0.4px;
 
+            color: #777;
             background: transparent;
 
             cursor: pointer;
@@ -437,10 +476,15 @@
         }
 
         .tool-arrow {
+            font-family: "Montserrat", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 500;
+            font-style: italic;
+
             font-size: 11px;
+            line-height: 1;
         }
 
-        /* 文本输入 */
+        /* ===== 文本输入 ===== */
         .message-input {
             width: 100%;
             height: 100%;
@@ -450,8 +494,8 @@
 
             padding: 0 40px 0 14px;
             font-size: 14px;
-            line-height: 42px;
-            /* ⭐关键：和 input-wrapper 高度一致 */
+            line-height: 48.67px;
+            /* ✅ 与输入框高度一致 */
 
             color: #333;
 
@@ -459,7 +503,8 @@
             outline: none;
         }
 
-        /* 发送按钮（嵌在里面） */
+
+        /* ===== 发送按钮 ===== */
         .send-btn {
             position: absolute;
             right: 4px;
@@ -482,16 +527,25 @@
         .input-footer-label {
             position: fixed;
 
-            bottom: 6px;
-            /* 👈 控制它离 Home Indicator 的距离 */
+            bottom: 30px;
+            /* ≈ 89 / 3，保留你的视觉定位 */
             left: 0;
             right: 0;
 
             height: 24px;
+            /* 字体高度参考，保留 */
             line-height: 24px;
 
             text-align: center;
+
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+            font-weight: 600;
+            /* SemiBold（第一推荐） */
+            font-style: normal;
+
             font-size: 12px;
+            letter-spacing: 0.2px;
+            /* 比 TOOL 稍微收一点，更像 Eina 01 */
             color: #bdbdbd;
 
             background: transparent;
