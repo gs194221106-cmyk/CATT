@@ -98,9 +98,11 @@
         .header-card {
             position: relative;
             width: 100%;
-            height: 95.33px;
-            /* 154.33 - iPhone 15 状态栏 59 */
-            background: #ffffff;
+
+            /* 关键：高度 = 原高度 + safe area */
+            height: calc(95.33px + env(safe-area-inset-top));
+            padding-top: env(safe-area-inset-top);
+             background: #F7F7F7;
 
             box-shadow: inset 0 -0.5px 1px rgba(0, 0, 0, 0.05);
 
