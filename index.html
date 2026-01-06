@@ -98,11 +98,9 @@
         .header-card {
             position: relative;
             width: 100%;
-
-            /* 关键：高度 = 原高度 + safe area */
-            height: calc(95.33px + env(safe-area-inset-top));
-            padding-top: env(safe-area-inset-top);
-             background: #F7F7F7;
+            height: 95.33px;
+            /* 154.33 - iPhone 15 状态栏 59 */
+            background: #ffffff;
 
             box-shadow: inset 0 -0.5px 1px rgba(0, 0, 0, 0.05);
 
@@ -112,8 +110,7 @@
         /* 头部 - 角色状态栏（最终正确版，不再重复状态栏高度） */
         .header {
             position: absolute;
-            top: 0;
-            bottom: 22.67px;
+            bottom: 19px;
 
             left: 19.67px;
             right: 19.67px;
@@ -133,6 +130,8 @@
             padding-right: 29px;
 
             box-shadow:
+                0 -4px 14px rgba(0, 0, 0, 0.02),
+                /* 👈 上方感知关键 */
                 0 0 0.8px rgba(0, 0, 0, 0.03),
                 0 0.5px 14px rgba(0, 0, 0, 0.04);
         }
@@ -482,8 +481,10 @@
             background: #ffffff;
 
             box-shadow:
+                0 -4px 14px rgba(0, 0, 0, 0.02),
+                /* 👈 上方感知关键 */
                 0 0 0.8px rgba(0, 0, 0, 0.03),
-                0 4px 14px rgba(0, 0, 0, 0.04);
+                0 4px 14px rgba(0, 0, 0, 0.03);
 
             overflow: hidden;
             /* ✅ 必须保留 */
