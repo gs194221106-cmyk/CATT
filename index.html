@@ -300,6 +300,9 @@
             display: flex;
             margin-bottom: 12px;
             max-width: 100%;
+
+            align-items: flex-start;
+            /* ✅ 关键：禁止子项被拉伸算宽 */
         }
 
         .user-container {
@@ -316,6 +319,8 @@
         /* 修改：气泡内边距和文字大小 */
         .message {
             display: inline-block;
+            align-self: flex-start;
+            /* ✅ 双保险，彻底断 flex 计算 */
             /* 👈 关键 */
             padding: 10px 14px;
             border-radius: 18px;
