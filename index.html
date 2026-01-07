@@ -319,9 +319,7 @@
         /* 修改：气泡内边距和文字大小 */
         .message {
             display: inline-block;
-            align-self: flex-start;
-            /* ✅ 双保险，彻底断 flex 计算 */
-            /* 👈 关键 */
+
             padding: 10px 14px;
             border-radius: 18px;
             position: relative;
@@ -330,14 +328,13 @@
             font-size: 13px;
             line-height: 1.4;
 
-            max-width: 85%;
-            /* 控制最大气泡宽 */
-            word-break: break-word;
-            /* 中文友好 */
+            /* ✅ 核心三行 */
+            inline-size: max-content;
+            /* 气泡按内容真实宽度 */
+            max-inline-size: 85%;
+            /* 不超过屏幕 */
             white-space: pre-wrap;
-            /* 保留换行但不撑宽 */
-
-            /* ❌ 不要 width: fit-content */
+            word-break: break-word;
         }
 
         @keyframes fadeIn {
