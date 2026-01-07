@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 
 <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -316,7 +317,7 @@
             margin-left: 15px;
         }
 
-        /* 修改：气泡内边距和文字大小 */
+        /* 修改：气泡内边距 + 字体 + 稳定宽度 */
         .message {
             display: inline-block;
 
@@ -328,13 +329,20 @@
             font-size: 13px;
             line-height: 1.4;
 
-            /* ✅ 核心三行 */
-            inline-size: max-content;
-            /* 气泡按内容真实宽度 */
-            max-inline-size: 85%;
-            /* 不超过屏幕 */
+            /* ✅ 聊天专用字体（已确认） */
+            font-family: "Noto Sans SC",
+                "Source Han Sans SC",
+                -apple-system,
+                BlinkMacSystemFont,
+                "PingFang SC",
+                sans-serif;
+
+            /* ✅ 最稳定、不折磨人的组合 */
+            max-width: 85%;
             white-space: pre-wrap;
             word-break: break-word;
+
+            /* ❌ 不要 inline-size / fit-content */
         }
 
         @keyframes fadeIn {
