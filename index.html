@@ -131,7 +131,8 @@
             padding-right: 29px;
 
             box-shadow:
-                0 6px 16px rgba(0, 0, 0, 0.03)
+                0 0 0.8px rgba(0, 0, 0, 0.03),
+                0 0.5px 14px rgba(0, 0, 0, 0.04);
         }
 
         .header-left {
@@ -294,7 +295,7 @@
             background: transparent;
         }
 
-        /* 修改：聊天气泡最大宽度 */
+        /* 气泡容器 */
         .message-container {
             display: flex;
             margin-bottom: 12px;
@@ -314,17 +315,24 @@
 
         /* 修改：气泡内边距和文字大小 */
         .message {
+            display: inline-block;
+            /* 👈 关键 */
             padding: 10px 14px;
             border-radius: 18px;
             position: relative;
             animation: fadeIn 0.3s ease;
+
             font-size: 13px;
             line-height: 1.4;
+
             max-width: 85%;
-            /* 👈 关键在这 */
-            width: fit-content;
-            /* 👈 让气泡贴内容 */
-            word-wrap: break-word;
+            /* 控制最大气泡宽 */
+            word-break: break-word;
+            /* 中文友好 */
+            white-space: pre-wrap;
+            /* 保留换行但不撑宽 */
+
+            /* ❌ 不要 width: fit-content */
         }
 
         @keyframes fadeIn {
