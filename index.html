@@ -2508,14 +2508,14 @@
     <!-- JavaScript 代码 -->
     <script>
 
-        // ==========================
+        /*// ==========================
         // Voice Record Global State
         // ==========================
         let mediaRecorder = null;
         let audioChunks = [];
         let recordStartTime = 0;
         let recordStream = null; // ✅ 新增：保存 stream
-        let isRecording = false;
+        let isRecording = false; */
 
         // 初始化数据
         let appData = {
@@ -2548,7 +2548,7 @@
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
-        const voiceBtn = document.getElementById('voiceBtn'); // 👈 就加在这一堆里
+       // const voiceBtn = document.getElementById('voiceBtn'); // 👈 就加在这一堆里
         const settingsBtn = document.querySelector('.settings-btn');
         const settingsPanel = document.getElementById('settingsPanel');
         const closeSettings = document.querySelector('.close-settings');
@@ -3088,7 +3088,7 @@
 
             } else if (msg.type === 'image') {
                 container.innerHTML =
-                    `< img src="${msg.content}" style="max-width:200px;border-radius:5px;">`;
+                    `<img src="${msg.content}" style="max-width:200px;border-radius:5px;">`;
 
             } else if (msg.type === 'emoji') {
                 container.innerHTML =
@@ -3096,7 +3096,7 @@
 
             } else if (msg.type === 'sticker') {
                 container.innerHTML =
-                    `< img src="${msg.content}" style="max-width:100px;border-radius:5px;">`;
+                    `<img src="${msg.content}" style="max-width:100px;border-radius:5px;">`;
             }
         }
 
@@ -3601,170 +3601,7 @@
             }
         }
 
-        // 添加消息到聊天区域
-        function addMessageToChat(msg) {
-            const messageContainer = document.createElement('div');
-            messageContainer.className = `message-container ${msg.sender}-container`;
-
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${msg.sender}-message`;
-
-            // ==========================
-            // 有引用的情况
-            // ==========================
-            if (msg.quote) {
-                const messageWithQuote = document.createElement('div');
-                messageWithQuote.className = 'message-with-quote';
-
-                const quotedContent = document.createElement('div');
-                quotedContent.className = 'quoted-content';
-
-                const quoteSender = document.createElement('div');
-                quoteSender.className = 'quote-sender';
-                quoteSender.textContent =
-                    msg.quoteSender ||
-                    (msg.sender === 'user'
-                        ? appData.userName
-                        : getCurrentFriend().name);
-
-                const quoteText = document.createElement('div');
-                quoteText.className = 'quoted-text';
-
-                if (msg.quoteType === 'image' || msg.quoteType === 'sticker') {
-                    const quoteImage = document.createElement('img');
-                    quoteImage.src = msg.quote;
-                    quoteImage.className = 'quoted-image';
-                    quoteText.appendChild(quoteImage);
-                } else {
-                    quoteText.textContent =
-                        msg.quote.length > 50
-                            ? msg.quote.substring(0, 50) + '...'
-                            : msg.quote;
-                }
-
-                const mainContent = document.createElement('div');
-                mainContent.className = 'main-content';
-
-                // 👉 内容类型判断（重点在这里）
-                if (msg.type === 'text') {
-                    mainContent.textContent = msg.content;
-                } else if (msg.type === 'image') {
-                    mainContent.innerHTML =
-                        `<img src="${msg.content}" style="max-width:200px;border-radius:5px;">`;
-                } else if (msg.type === 'emoji') {
-                    mainContent.innerHTML =
-                        `<div style="font-size:13px;line-height:1.4;">${msg.content}</div>`;
-                } else if (msg.type === 'sticker') {
-                    mainContent.innerHTML =
-                        `<img src="${msg.content}" style="max-width:100px;border-radius:5px;">`;
-                } else if (msg.type === 'voice') {
-                    renderVoiceContent(mainContent, msg);
-                }
-
-                quotedContent.appendChild(quoteSender);
-                quotedContent.appendChild(quoteText);
-                messageWithQuote.appendChild(quotedContent);
-                messageWithQuote.appendChild(mainContent);
-                messageDiv.appendChild(messageWithQuote);
-
-                // ==========================
-                // 无引用的情况
-                // ==========================
-            } else {
-                if (msg.type === 'text') {
-                    messageDiv.innerHTML = `<div>${msg.content}</div>`;
-                } else if (msg.type === 'image') {
-                    messageDiv.innerHTML =
-                        `<img src="${msg.content}" style="max-width:200px;border-radius:5px;">`;
-                } else if (msg.type === 'emoji') {
-                    messageDiv.innerHTML =
-                        `<div style="font-size:13px;line-height:1.4;">${msg.content}</div>`;
-                } else if (msg.type === 'sticker') {
-                    messageDiv.innerHTML =
-                        `<img src="${msg.content}" style="max-width:100px;border-radius:5px;">`;
-                } else if (msg.type === 'voice') {
-                    renderVoiceContent(messageDiv, msg);
-                }
-            }
-
-            // 添加点击事件监听
-            messageDiv.addEventListener('click', handleMessageClick);
-
-            messageContainer.appendChild(messageDiv);
-            chatArea.appendChild(messageContainer);
-
-            // 确保滚动到底部
-            setTimeout(() => {
-                chatArea.scrollTop = chatArea.scrollHeight;
-            }, 50);
-        }
-
-        // 添加语音（最终稳定版）
-        function renderVoiceContent(container, msg) {
-            const voiceContent = document.createElement('div');
-            voiceContent.className = 'voice-content';
-
-            // 👇 固定长度（不再随秒数变化）
-            voiceContent.style.width = '85px';
-
-
-            /* ===== 秒数（左） ===== */
-            const duration = document.createElement('span');
-            duration.className = 'voice-duration';
-            duration.textContent = msg.content.duration + '"';
-
-            /* ===== 微信声波（右，CSS 镜像朝左 ((()）===== */
-            const icon = document.createElement('span');
-            icon.className = 'voice-icon';
-            icon.innerHTML = `
-        <svg class="voice-svg flip-left" viewBox="0 0 24 24" aria-hidden="true">
-            <path class="wave w1" d="M3 12a2 2 0 0 1 0 0"></path>
-            <path class="wave w2" d="M6 9a4 4 0 0 1 0 6"></path>
-            <path class="wave w3" d="M9 6a7 7 0 0 1 0 12"></path>
-        </svg>
-    `;
-
-            /* ===== audio ===== */
-            const audio = document.createElement('audio');
-            audio.preload = 'none';
-
-            if (
-                msg.content &&
-                typeof msg.content.audio === 'string' &&
-                msg.content.audio.startsWith('data:audio')
-            ) {
-                audio.src = msg.content.audio;
-            } else {
-                voiceContent.classList.add('voice-invalid');
-            }
-
-            /* ===== DOM 顺序：秒数 → 声波 ===== */
-            voiceContent.appendChild(duration);
-            voiceContent.appendChild(icon);
-            voiceContent.appendChild(audio);
-
-            /* ===== 点击播放 ===== */
-            voiceContent.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!audio.src) return;
-
-                if (audio.paused) {
-                    audio.play();
-                    voiceContent.classList.add('playing');
-                } else {
-                    audio.pause();
-                    voiceContent.classList.remove('playing');
-                }
-            });
-
-            /* ===== 播放结束 ===== */
-            audio.addEventListener('ended', () => {
-                voiceContent.classList.remove('playing');
-            });
-
-            container.appendChild(voiceContent);
-        }
-
+       
         //输入栏变化高度
         const textarea = document.querySelector('.message-input');
         const wrapper = document.querySelector('.input-wrapper');
