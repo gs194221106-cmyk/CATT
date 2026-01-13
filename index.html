@@ -2352,8 +2352,8 @@
                 <div class="setting-section">
                     <h3>角色头像设置</h3>
                     <div class="avatar-preview">
-                        <div class="avatar" id="avatarPreview">
-                            <!-- 头像预览 -->
+                        <div class="avatar-wrapper avatar-lg">
+                            <div class="avatar" id="avatarPreview"></div>
                         </div>
                     </div>
                     <div class="file-input-container">
@@ -2361,7 +2361,7 @@
                         <button class="capsule-btn" id="uploadAvatarBtn">从本地导入头像</button>
                     </div>
                     <div class="compression-info">
-                        头像将自动裁剪为48x48像素，不会变形
+                        头像将自动裁剪为正方形并以高清尺寸保存
                     </div>
                 </div>
 
@@ -3946,7 +3946,7 @@
             }
         }
 
-        // 压缩头像图片 - 使用裁剪而非缩放
+        // ✅ 高清头像压缩（3x，防糊）
         function compressAvatar(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -3955,39 +3955,42 @@
                     const img = new Image();
 
                     img.onload = function () {
+                        const SIZE = 144; // ⭐ 3x 尺寸（48 × 3）
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
 
-                        // 设置画布尺寸
-                        canvas.width = 48;
-                        canvas.height = 48;
+                        canvas.width = SIZE;
+                        canvas.height = SIZE;
 
-                        // 计算裁剪区域，保持图片比例
                         const imgAspect = img.width / img.height;
-                        const canvasAspect = 1; // 1:1 比例
+                        let sx, sy, sw, sh;
 
-                        let drawWidth, drawHeight, offsetX, offsetY;
-
-                        if (imgAspect > canvasAspect) {
-                            // 图片更宽，按高度裁剪
-                            drawHeight = img.height;
-                            drawWidth = img.height * canvasAspect;
-                            offsetX = (img.width - drawWidth) / 2;
-                            offsetY = 0;
+                        if (imgAspect > 1) {
+                            // 横图
+                            sh = img.height;
+                            sw = img.height;
+                            sx = (img.width - sw) / 2;
+                            sy = 0;
                         } else {
-                            // 图片更高，按宽度裁剪
-                            drawWidth = img.width;
-                            drawHeight = img.width / canvasAspect;
-                            offsetX = 0;
-                            offsetY = (img.height - drawHeight) / 2;
+                            // 竖图
+                            sw = img.width;
+                            sh = img.width;
+                            sx = 0;
+                            sy = (img.height - sh) / 2;
                         }
 
-                        // 绘制并裁剪图片
-                        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight, 0, 0, 48, 48);
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
 
-                        // 转换为压缩后的base64
-                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                        resolve(compressedDataUrl);
+                        ctx.drawImage(
+                            img,
+                            sx, sy, sw, sh,
+                            0, 0, SIZE, SIZE
+                        );
+
+                        // ✅ 用 PNG，不要 JPEG（头像边缘会更干净）
+                        const dataUrl = canvas.toDataURL('image/png');
+                        resolve(dataUrl);
                     };
 
                     img.onerror = reject;
