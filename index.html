@@ -419,13 +419,14 @@
                 0 0.5px 1.5px rgba(0, 0, 0, 0.035);
         }
 
-        /* ===== 时间分割线（胶囊气泡版） ===== */
+        /* ===== 时间分割线（胶囊气泡版 · 精修小号） ===== */
         .time-divider {
             text-align: center;
-            margin: 15px 0;
-            font-size: 11px;
+            margin: 12px 0;
+            /* ⬅ 上下间距略收 */
+            font-size: 9px;
+            /* ⬅ 比消息再小一档 */
             color: #8e8e93;
-            /* iOS 系统灰 */
 
             position: relative;
         }
@@ -433,13 +434,15 @@
         .time-divider span {
             display: inline-block;
 
-            padding: 4px 10px;
+            padding: 2px 8px;
+            /* ⬅ 关键：明显压扁高度 */
             border-radius: 999px;
 
-            background-color: rgba(0, 0, 0, 0.06);
+            background-color: rgba(0, 0, 0, 0.038);
+            /* ⬅ 再淡一点 */
 
-            position: relative;
-            z-index: 1;
+            line-height: 1.4;
+            /* ⬅ 防止字体撑高 */
         }
 
 
@@ -2581,11 +2584,12 @@
         // ==========================
         // Voice Record Global State
         // ==========================
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let recordStartTime = 0;
-        let recordStream = null; // ✅ 新增：保存 stream
-        let isRecording = false;
+        let lastRenderedDate = null;
+        //let mediaRecorder = null;
+        //let audioChunks = [];
+        //let recordStartTime = 0;
+        //let recordStream = null; // ✅ 新增：保存 stream
+        //let isRecording = false;
 
         // 初始化数据
         let appData = {
@@ -3195,9 +3199,15 @@
                 const timeDivider = document.createElement('div');
                 timeDivider.className = 'time-divider';
 
-                const text = index === 0
-                    ? `${formatDate(msg.timestamp)} ${currentTime}`
-                    : currentTime;
+                const dateText = formatDate(msg.timestamp, lastRenderedDate);
+
+                let text;
+                if (dateText) {
+                    text = `${dateText} ${currentTime}`;
+                    lastRenderedDate = msg.timestamp; // ⭐ 只有显示了日期才更新
+                } else {
+                    text = currentTime;
+                }
 
                 timeDivider.innerHTML = `<span>${text}</span>`;
                 fragment.appendChild(timeDivider);
@@ -3272,7 +3282,9 @@
         // ==========================
         function renderChat() {
             chatArea.innerHTML = '';
+            lastRenderedDate = null; // ⭐ 新增：重置日期锚点
             const currentFriend = getCurrentFriend();
+
 
             // 背景处理
             const chatBg = document.getElementById('chatBg');
@@ -3367,6 +3379,7 @@
             // 跨年 → 显示 年月日
             return `${year}年${month}月${day}日`;
         }
+
         // 渲染设置界面
         function renderSettings() {
             const currentFriend = getCurrentFriend();
