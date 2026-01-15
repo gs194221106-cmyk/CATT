@@ -20,13 +20,11 @@
             --wechat-time: #B2B2B2;
             --bubble-user: #E7F2FF;
             --bubble-bot: #FFFFFF;
-            --light-pink: #FFB6C1;
-            --input-pink: #FFF5F5;
-            --quote-bg: #F5F5F5;
+            --light-blue: var(--bubble-user);
+            --quote-bg: #FAFAFA;
             --quote-border-user: #FFCECE;
-            --quote-border-bot: #FFCECE;
+            --quote-border-bot: var(--bubble-user);
             --korea-primary: #FFB6C1;
-            --icon-pink: #FF8FA3;
 
             /* 新增：角色信息颜色变量 - 默认浅色主题 */
             --header-text-color: rgba(255, 255, 255, 0.9);
@@ -531,6 +529,113 @@
             line-height: 1;
         }
 
+        /* =========================
+   Tool Panel（严格 ÷3 还原版）
+   ========================= */
+        .tool-panel {
+            position: fixed;
+            /* 🔥 改这里：出生点 */
+            top: 23%;
+            left: 67%;
+            transform: translate(-50%, -50%);
+            /* ↑ 从“中心点”出生，而不是底部 */
+            z-index: 9999;
+
+            /* ✅ 设计稿 ÷3 后的固定尺寸 */
+            width: 185px;
+            height: 57px;
+
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+
+            /* ✅ 圆角 ÷3 */
+            border-radius: 22px;
+
+            /* ✅ padding ÷3 */
+            padding: 7px 9px;
+
+            /* ✅ 阴影 */
+            box-shadow:
+                0 4px 20px rgba(0, 0, 0, 0.035),
+                0 1.5px 6px rgba(0, 0, 0, 0.025);
+
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        /* 隐藏状态 */
+        .tool-panel.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, 20px);
+        }
+
+        .tool-panel-header {
+            height: 10px;
+            cursor: grab;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tool-drag-bar {
+            width: 23px;
+            height: 1.5px;
+            border-radius: 1px;
+            background: rgba(0, 0, 0, 0.15);
+
+            transform: translateY(-4.5px);
+            /* 👈 向上提，1~3px 自己微调 */
+        }
+
+        .tool-panel-header:active {
+            cursor: grabbing;
+        }
+
+
+        .tool-panel-inner {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+
+            margin-top: 0px;
+            /* 👈 往上贴一点 */
+        }
+
+
+        .tool-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            /* ⬅️ 图标和文字的距离要克制 */
+            gap: 3px;
+
+            background: none;
+            border: none;
+            padding: 0;
+
+            cursor: pointer;
+
+            color: #111;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif;
+
+            /* ⬅️ 文字一定要退后 */
+            font-size: 6px;
+            font-weight: 500;
+            opacity: 0.75;
+        }
+
+        /* SVG 统一大小（这个值是对的，不用再动） */
+        .tool-btn svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        /* 点击反馈 */
+        .tool-btn:active {
+            transform: scale(0.94);
+            opacity: 0.8;
+        }
 
         /* ===== 输入框主体（基于原始 50px） ===== */
         .input-wrapper {
@@ -1356,27 +1461,45 @@
             display: none !important;
         }
 
-        /* 修改：表情包选择框调整 - 放大一丢丢，间距更小 */
+        /* ===== Sticker Picker（跟随 Tool Panel 底部出现） ===== */
         .sticker-picker {
             position: absolute;
-            bottom: 70px;
-            left: 15px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            padding: 15px;
-            width: calc(100% - 30px);
-            height: 150px;
+
+            top: 100%;
+            /* 🔥 从 panel 底部出生 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 99%;
+            /* 🔥 和 panel 同宽 */
+
+            margin-top: 6px;
+            /* panel 与 sticker 的间距 */
+
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+
+            border-radius: 20px;
+            padding: 12px;
+
+            height: 160px;
+            /* 比你原来 150 略大一点 */
             overflow-y: auto;
             overflow-x: hidden;
-            z-index: 5;
+
+            box-shadow:
+                0 3px 14px rgba(0, 0, 0, 0.04),
+                0 1px 4px rgba(0, 0, 0, 0.025);
+
+            z-index: 10;
+
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
-            /* 放大一点 */
-            gap: 8px;
-            /* 间距更小 */
+            grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+            gap: 6px;
+            /* 🔥 比之前更紧凑 */
             align-content: flex-start;
+
             touch-action: pan-y;
+            box-sizing: border-box;
         }
 
         .multi-file-label {
@@ -2226,7 +2349,7 @@
             <div class="input-area">
                 <div class="input-btn">
                     <!-- ⭐ TOOL 卡在“输入框”上 -->
-                    <div class="tool-label">
+                    <div class="tool-label" id="toolToggle">
                         TOOL <span class="tool-arrow">^</span>
                     </div>
                     <!-- 语音 -->
@@ -2255,9 +2378,141 @@
             • Have a nice day •
         </div>
 
-        <!-- 其余HTML内容保持不变 -->
-        <div class="sticker-picker hidden" id="stickerPicker">
-            <!-- 表情包选择器内容 -->
+        <!-- =========================
+     Tool Floating Panel 可移动工具窗口
+     ========================= -->
+        <div id="tool-panel" class="tool-panel hidden">
+            <!-- Image 上传 input（必须存在，JS 才能 click） -->
+            <input type="file" id="imageFileInput" class="hidden-file-input" accept="image/*" />
+            <!-- 🔹 可拖拽头部（唯一拖拽区） -->
+            <div class="tool-panel-header" id="toolPanelDrag">
+                <!-- 可选：iOS 风格小横条 -->
+                <div class="tool-drag-bar"></div>
+            </div>
+            <div class="sticker-picker hidden" id="stickerPicker">
+                <!-- 表情包选择器内容 -->
+            </div>
+            <!-- 🔹 工具按钮区（不可拖拽） -->
+            <div class="tool-panel-inner">
+
+
+                <!-- Sticker -->
+                <button class="tool-btn tool-sticker-btn">
+                    <!-- Sticker SVG -->
+                    <svg class="tool-icon" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14 26C14 26 17 30 22 30C27 30 30 26 30 26
+         M16 16H16.02
+         M28 16H28.02
+         M42 22C42 33.0457 33.0457 42 22 42
+         C10.9543 42 2 33.0457 2 22
+         C2 10.9543 10.9543 2 22 2
+         C33.0457 2 42 10.9543 42 22Z" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+
+                    <span>Sticker</span>
+                </button>
+
+                <!-- Image -->
+                <button class="tool-btn tool-image-btn">
+                    <!-- Image SVG -->
+                    <svg class="tool-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M35 13H35.02
+         M14 4H34C39.5228 4 44 8.47715 44 14V34
+         C44 39.5228 39.5228 44 34 44H14
+         C8.47715 44 4 39.5228 4 34V14
+         C4 8.47715 8.47715 4 14 4Z
+         M32 22.74C32.2468 24.4045 31.9625 26.1044
+         31.1875 27.598C30.4125 29.0916
+         29.1863 30.3028 27.6833 31.0593
+         C26.1802 31.8159 24.4769 32.0792
+         22.8156 31.8119C21.1543 31.5445
+         19.6195 30.7602 18.4297 29.5703
+         C17.2398 28.3805 16.4555 26.8457
+         16.1881 25.1844C15.9208 23.5231
+         16.1841 21.8198 16.9407 20.3167
+         C17.6972 18.8137 18.9084 17.5875
+         20.402 16.8125C21.8956 16.0375
+         23.5955 15.7532 25.26 16
+         C26.9578 16.2518 28.5297 17.0429
+         29.7434 18.2566C30.9571 19.4703
+         31.7482 21.0422 32 22.74Z" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+
+                    <span>Image</span>
+                </button>
+
+                <!-- Call -->
+                <button class="tool-btn tool-call-btn">
+                    <!-- Call SVG -->
+                    <svg class="tool-icon" viewBox="0 0 46 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M27.8762 10
+         C29.8297 10.3811 31.625 11.3365 33.0324 12.7439
+         C34.4397 14.1512 35.3951 15.9465 35.7762 17.9
+         M27.8762 2
+         C31.9348 2.45087 35.7194 4.26835 38.6087 7.15402
+         C41.498 10.0397 43.3203 13.822 43.7762 17.88
+         M41.7762 33.84V39.84
+         C41.7785 40.397 41.6644 40.9483 41.4413 41.4587
+         C41.2181 41.9691 40.8908 42.4272 40.4804 42.8037
+         C40.0699 43.1803 39.5854 43.467 39.0577 43.6454
+         C38.5301 43.8239 37.971 43.8901 37.4162 43.84
+         C31.2619 43.1713 25.3502 41.0683 20.1562 37.7
+         C15.3239 34.6293 11.2269 30.5323 8.15623 25.7
+         C4.77619 20.4824 2.67272 14.542 2.01623 8.36
+         C1.96625 7.80693 2.03198 7.24952 2.20923 6.72325
+         C2.38649 6.19698 2.67138 5.71338 3.04577 5.30324
+         C3.42016 4.89311 3.87584 4.56542 4.38382 4.34104
+         C4.89179 4.11667 5.44091 4.00052 5.99623 4
+         H11.9962
+         C12.9668 3.99045 13.9078 4.33416 14.6438 4.96707
+         C15.3797 5.59997 15.8604 6.47889 15.9962 7.44
+         C16.2495 9.36013 16.7191 11.2455 17.3962 13.06
+         C17.6653 13.7758 17.7236 14.5538 17.564 15.3018
+         C17.4045 16.0497 17.034 16.7362 16.4962 17.28
+         L13.9562 19.82
+         C16.8033 24.8271 20.9491 28.9729 25.9562 31.82
+         L28.4962 29.28
+         C29.04 28.7423 29.7265 28.3717 30.4745 28.2122
+         C31.2224 28.0527 32.0004 28.1109 32.7162 28.38
+         C34.5308 29.0571 36.4161 29.5268 38.3362 29.78
+         C39.3078 29.9171 40.195 30.4064 40.8293 31.155
+         C41.4636 31.9036 41.8006 32.8592 41.7762 33.84Z" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+
+                    <span>Call</span>
+                </button>
+
+                <!-- Like -->
+                <button class="tool-btn tool-like-btn">
+                    <!-- Like SVG -->
+                    <svg class="tool-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M41.68 9.21999
+         C40.6585 8.198 39.4456 7.38728 38.1107 6.83416
+         C36.7758 6.28103 35.345 5.99634 33.9 5.99634
+         C32.455 5.99634 31.0242 6.28103 29.6893 6.83416
+         C28.3544 7.38728 27.1415 8.198 26.12 9.21999
+         L24 11.34
+         L21.88 9.21999
+         C19.8166 7.15661 17.0181 5.99741 14.1 5.99741
+         C11.1819 5.99741 8.38338 7.15661 6.31999 9.21999
+         C4.25661 11.2834 3.09741 14.0819 3.09741 17
+         C3.09741 19.9181 4.25661 22.7166 6.31999 24.78
+         L24 42.46
+         L41.68 24.78
+         C42.702 23.7585 43.5127 22.5456 44.0658 21.2107
+         C44.6189 19.8758 44.9036 18.445 44.9036 17
+         C44.9036 15.555 44.6189 14.1242 44.0658 12.7893
+         C43.5127 11.4544 42.702 10.2415 41.68 9.21999Z" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+
+                    <span>Like</span>
+                </button>
+
+            </div>
         </div>
 
         <!-- 好友面板 -->
@@ -2607,10 +2862,10 @@
         const settingsBtn = document.querySelector('.settings-btn');
         const settingsPanel = document.getElementById('settingsPanel');
         const closeSettings = document.querySelector('.close-settings');
-        //const stickerBtn = document.querySelector('.sticker-btn');
-        // const stickerPicker = document.getElementById('stickerPicker');
-        //const imageBtn = document.querySelector('.image-btn');
-        //const imageFileInput = document.getElementById('imageFileInput');
+        const stickerBtn = document.querySelector('.tool-sticker-btn');
+        const imageBtn = document.querySelector('.tool-image-btn');
+        const stickerPicker = document.getElementById('stickerPicker');
+        const imageFileInput = document.getElementById('imageFileInput');
         const botNameElement = document.getElementById('botName');
         const botAvatar = document.getElementById('botAvatar');
         const botNameInput = document.getElementById('botNameInput');
@@ -3360,6 +3615,58 @@
             // 跨年 → 显示 年月日
             return `${year}年${month}月${day}日`;
         }
+
+        //tool弹窗。
+        const panel = document.getElementById("tool-panel");
+        const dragHandle = document.getElementById("toolPanelDrag");
+        const toggleBtn = document.getElementById("toolToggle");
+
+        /* 显示 / 隐藏 */
+        toggleBtn.addEventListener("click", () => {
+            panel.classList.toggle("hidden");
+        });
+
+        /* ===== 仅头部拖拽 ===== */
+
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+
+        dragHandle.addEventListener("pointerdown", (e) => {
+            isDragging = true;
+
+            // 用真实视觉位置计算（不要用 offsetLeft 的旧值）
+            const rect = panel.getBoundingClientRect();
+
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+
+            // ⭐ 核心修复：从 bottom 定位 → top/left 定位
+            panel.style.left = rect.left + "px";
+            panel.style.top = rect.top + "px";
+            panel.style.bottom = "auto";      // ✅ 必须清掉，不然会拉伸高度
+            panel.style.transform = "none";   // ✅ 清掉 translateX(-50%)
+
+            dragHandle.setPointerCapture(e.pointerId);
+
+            panel.style.cursor = "grabbing";
+        });
+
+        dragHandle.addEventListener("pointermove", (e) => {
+            if (!isDragging) return;
+
+            panel.style.left = `${e.clientX - startX}px`;
+            panel.style.top = `${e.clientY - startY}px`;
+        });
+
+        dragHandle.addEventListener("pointerup", () => {
+            isDragging = false;
+            panel.style.cursor = "default";
+        });
+
+        dragHandle.addEventListener("pointercancel", () => {
+            isDragging = false;
+        });
 
         // 渲染设置界面
         function renderSettings() {
@@ -4247,28 +4554,38 @@
 
         closeSettings.addEventListener('click', closePanel);
 
-        // stickerBtn.addEventListener('click', () => {
-        //    stickerPicker.classList.toggle('hidden');
-        // });
+        // === Sticker ===
+        if (stickerBtn && stickerPicker) {
+            stickerBtn.addEventListener('click', () => {
+                stickerPicker.classList.toggle('hidden');
+            });
+        }
 
-        //imageBtn.addEventListener('click', () => {
-        //   imageFileInput.click();
-        // });
+        // === Image ===
+        if (imageBtn && imageFileInput) {
+            imageBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // 防止被拖拽逻辑吃掉
+                imageFileInput.click();
+            });
+        }
 
-        // imageFileInput.addEventListener('change', async (e) => {
-        //  const files = e.target.files;
-        // if (files && files.length > 0) {
-        //    const file = files[0];
-        //    const reader = new FileReader();
+        // === Image file change ===
+        if (imageFileInput) {
+            imageFileInput.addEventListener('change', async (e) => {
+                const files = e.target.files;
+                if (!files || files.length === 0) return;
 
-        //   reader.onload = async (event) => {
-        //      await sendMessage(event.target.result, 'image');
-        //     imageFileInput.value = '';
-        // };
+                const file = files[0];
+                const reader = new FileReader();
 
-        //  reader.readAsDataURL(file);
-        // }
-        //  });
+                reader.onload = async (event) => {
+                    await sendMessage(event.target.result, 'image');
+                    imageFileInput.value = '';
+                };
+
+                reader.readAsDataURL(file);
+            });
+        }
 
         userNameInput.addEventListener('change', () => {
             appData.userName = userNameInput.value;
