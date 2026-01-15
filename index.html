@@ -20,13 +20,11 @@
             --wechat-time: #B2B2B2;
             --bubble-user: #E7F2FF;
             --bubble-bot: #FFFFFF;
-            --light-pink: #FFB6C1;
-            --input-pink: #FFF5F5;
-            --quote-bg: #F5F5F5;
+            --light-blue: var(--bubble-user);
+            --quote-bg: #FAFAFA;
             --quote-border-user: #FFCECE;
-            --quote-border-bot: #FFCECE;
+            --quote-border-bot: var(--bubble-user);
             --korea-primary: #FFB6C1;
-            --icon-pink: #FF8FA3;
 
             /* 新增：角色信息颜色变量 - 默认浅色主题 */
             --header-text-color: rgba(255, 255, 255, 0.9);
@@ -56,6 +54,10 @@
             --panel-width: 100vw;
             --panel-height: 100vh;
             --panel-padding: 20px;
+
+            /*聊天页面头像*/
+            --avatar-size: 32px;
+            --avatar-gap: 12px;
 
         }
 
@@ -102,7 +104,7 @@
         .header-card {
             position: relative;
             width: 100%;
-            height: 95.33px;
+            height: 75px;
             background: #ffffff;
             box-shadow: inset 0 -0.5px 1px rgba(0, 0, 0, 0.05);
             flex-shrink: 0;
@@ -119,7 +121,7 @@
             left: 19.67px;
             right: 19.67px;
 
-            height: 72px;
+            height: 60px;
             background: #ffffff;
             border-radius: 14px;
 
@@ -128,7 +130,6 @@
             justify-content: space-between;
 
             padding-left: 31px;
-            padding-right: 29px;
 
             box-shadow:
                 0 0 0.8px rgba(0, 0, 0, 0.03),
@@ -153,9 +154,9 @@
         /* 用于承载头像 + 在线点（不参与布局） */
         .avatar-wrapper {
             position: relative;
-            width: 42.33px;
-            height: 42.33px;
-            margin-right: 11.33px;
+            width: 37px;
+            height: 37px;
+            margin-right: 10px;
             /* ✅ 头像与文字的真实间距 */
         }
 
@@ -178,6 +179,7 @@
             color: white;
             font-weight: 600;
             font-size: 15px;
+
             box-shadow: 0 0 0 2px #fff, 0 2px 6px rgba(0, 0, 0, 0.12);
         }
 
@@ -226,16 +228,16 @@
         }
 
         .chat-title {
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 500;
             color: var(--header-text-color);
-            line-height: 1.2;
-            margin-bottom: 1.2px;
+            line-height: 1.1;
+            margin-bottom: 1.1px;
             text-shadow: var(--header-text-shadow);
         }
 
         .chat-status {
-            font-size: 9px;
+            font-size: 7px;
             line-height: 1.3;
             color: var(--header-status-color);
             text-shadow: var(--header-text-shadow);
@@ -247,19 +249,19 @@
         .header-right {
             display: flex;
             align-items: center;
-            margin-right: 10px;
+            margin-right: 27px;
         }
 
         .settings-btn {
             position: relative;
             overflow: visible;
 
-            width: 36px;
-            height: 28px;
+            width: 30px;
+            height: 24px;
 
             background: #000;
             border: none;
-            border-radius: 7px;
+            border-radius: 6px;
 
             display: flex;
             align-items: center;
@@ -273,7 +275,7 @@
         .settings-btn::before {
             content: "♥";
             color: #fff;
-            font-size: 14px;
+            font-size: 11px;
             line-height: 1;
 
             position: relative;
@@ -286,7 +288,7 @@
             position: absolute;
 
             left: 50%;
-            bottom: -2px;
+            bottom: -1px;
             /* 吃进按钮一点 */
 
             width: 12px;
@@ -339,45 +341,46 @@
             background: transparent;
         }
 
-        /* 气泡容器 */
+        .chat-area {
+            --message-avatar-size: 32px;
+            --message-avatar-gap: 10px;
+        }
+
+        /* 气泡容器（头像 + 气泡整体） */
         .message-container {
             display: flex;
-            margin-bottom: 12px;
-            max-width: 100%;
+            margin-bottom: 17.5px;
 
+            max-width: 85%;
+            /* ⭐ 关键：整体限制 */
             align-items: flex-start;
-            /* ✅ 关键：禁止子项被拉伸算宽 */
         }
 
         .user-container {
             margin-left: auto;
-            margin-right: 15px;
+            margin-right: 5px;
             justify-content: flex-end;
         }
 
         .bot-container {
             margin-right: auto;
-            margin-left: 15px;
+            margin-left: 5px;
         }
 
-        /* 修改：气泡内边距 + 字体 + 稳定宽度 */
         .message {
             display: inline-block;
 
-            padding: 10px 14px;
-            border-radius: 18px;
+            padding: 8px 12px;
+            border-radius: 14px;
             position: relative;
             animation: fadeIn 0.3s ease;
 
-            font-size: 13px;
-            line-height: 1.4;
+            font-size: 12.5px;
+            line-height: 1.35;
 
-            /* ✅ 最稳定、不折磨人的组合 */
-            max-width: 85%;
+            max-width: calc(100% - var(--avatar-size) - var(--avatar-gap));
             white-space: pre-wrap;
             word-break: break-word;
-
-            /* ❌ 不要 inline-size / fit-content */
         }
 
         @keyframes fadeIn {
@@ -390,6 +393,61 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* ===== 图片 / 表情包消息：彻底移除气泡 ===== */
+        .message.no-bubble,
+        .message.no-bubble.user-message,
+        .message.no-bubble.bot-message {
+            background: none !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+
+        /* ===== 聊天消息头像 ===== */
+        .message-avatar {
+            width: var(--message-avatar-size);
+            height: var(--message-avatar-size);
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #ddd;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 13px;
+            font-weight: 500;
+            color: #fff;
+
+            transform: translateY(1px);
+        }
+
+        /* 头像里的图片 */
+        .message-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 用户消息：头像在右 */
+        .user-container {
+            flex-direction: row;
+        }
+
+        .user-container .message-avatar {
+            margin-left: var(--message-avatar-gap);
+        }
+
+        /* 对方消息：头像在左 */
+        .bot-container {
+            flex-direction: row;
+        }
+
+        .bot-container .message-avatar {
+            margin-right: var(--message-avatar-gap);
         }
 
         .user-message {
@@ -407,6 +465,7 @@
                 inset 0 -0.5px 1px rgba(0, 0, 0, 0.03),
                 0 0.5px 1.5px rgba(0, 0, 0, 0.035);
         }
+
 
         /* ===== 时间分割线（胶囊气泡版 · 精修小号） ===== */
         .time-divider {
@@ -439,7 +498,7 @@
         .input-area {
             position: relative;
             width: 100%;
-            height: 142px;
+            height: 122px;
             /* 👈 这里，88 → 96 */
             background: #ffffff;
             box-shadow: inset 0 0.5px 1px rgba(0, 0, 0, 0.05);
@@ -461,7 +520,7 @@
             left: 0;
             right: 0;
 
-            bottom: 62px;
+            bottom: 51.7px;
             /* 209 ÷ 3 */
 
             display: flex;
@@ -506,7 +565,7 @@
         .tool-label {
             position: absolute;
 
-            top: -6px;
+            top: -5px;
             /* 保留你的设计值 */
             left: 88px;
             /* ≈ 语音按钮宽度 + gap（可微调） */
@@ -515,7 +574,7 @@
             font-weight: 500;
             font-style: italic;
 
-            font-size: 12px;
+            font-size: 11px;
             line-height: 1;
             letter-spacing: 0.4px;
 
@@ -597,7 +656,7 @@
 
         .tool-panel-inner {
             display: flex;
-            gap: 12px;
+            gap: 16px;
             justify-content: center;
 
             margin-top: 0px;
@@ -675,8 +734,8 @@
             /* 用 padding 实现单行“视觉居中” */
             padding: 16px 40px 16px 19px;
 
-            font-size: 13px;
-            line-height: 1.4;
+            font-size: 12px;
+            line-height: 1.35;
 
             color: #333;
 
@@ -710,7 +769,7 @@
         .input-footer-label {
             position: fixed;
 
-            bottom: 21px;
+            bottom: 19.2px;
             /* ≈ 89 / 3，保留你的视觉定位 */
             left: 0;
             right: 0;
@@ -726,7 +785,7 @@
             /* SemiBold（第一推荐） */
             font-style: normal;
 
-            font-size: 12px;
+            font-size: 11px;
             letter-spacing: 0.2px;
             /* 比 TOOL 稍微收一点，更像 Eina 01 */
             color: #bdbdbd;
@@ -739,7 +798,7 @@
 
         /* 修改：输入栏placeholder字体大小 */
         .message-input::placeholder {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--wechat-time);
         }
 
@@ -1916,9 +1975,9 @@
         }
 
         .main-content {
-            font-size: 13px;
+            font-size: 12.5px;
             color: var(--wechat-text);
-            line-height: 1.4;
+            line-height: 1.35;
         }
 
         /* 优化图片上传区域 */
@@ -2379,7 +2438,7 @@
                     <!-- 输入框 -->
                     <div class="input-wrapper">
 
-                        <textarea class="message-input" id="messageInput" placeholder="输入消息..." rows="1"></textarea>
+                        <textarea class="message-input" id="messageInput" placeholder="iMessage…" rows="1"></textarea>
 
                         <button class="send-btn" id="sendBtn">➤</button>
                     </div>
@@ -2420,7 +2479,7 @@
          M42 22C42 33.0457 33.0457 42 22 42
          C10.9543 42 2 33.0457 2 22
          C2 10.9543 10.9543 2 22 2
-         C33.0457 2 42 10.9543 42 22Z" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+         C33.0457 2 42 10.9543 42 22Z" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
 
@@ -2450,7 +2509,7 @@
          23.5955 15.7532 25.26 16
          C26.9578 16.2518 28.5297 17.0429
          29.7434 18.2566C30.9571 19.4703
-         31.7482 21.0422 32 22.74Z" stroke="currentColor" stroke-width="4" stroke-linecap="round"
+         31.7482 21.0422 32 22.74Z" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
 
@@ -2492,8 +2551,8 @@
          C31.2224 28.0527 32.0004 28.1109 32.7162 28.38
          C34.5308 29.0571 36.4161 29.5268 38.3362 29.78
          C39.3078 29.9171 40.195 30.4064 40.8293 31.155
-         C41.4636 31.9036 41.8006 32.8592 41.7762 33.84Z" stroke="currentColor" stroke-width="4" stroke-linecap="round"
-                            stroke-linejoin="round" />
+         C41.4636 31.9036 41.8006 32.8592 41.7762 33.84Z" stroke="currentColor" stroke-width="3.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
 
                     <span>Call</span>
@@ -2519,8 +2578,8 @@
          C42.702 23.7585 43.5127 22.5456 44.0658 21.2107
          C44.6189 19.8758 44.9036 18.445 44.9036 17
          C44.9036 15.555 44.6189 14.1242 44.0658 12.7893
-         C43.5127 11.4544 42.702 10.2415 41.68 9.21999Z" stroke="currentColor" stroke-width="4" stroke-linecap="round"
-                            stroke-linejoin="round" />
+         C43.5127 11.4544 42.702 10.2415 41.68 9.21999Z" stroke="currentColor" stroke-width="3.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
 
                     <span>Like</span>
@@ -2610,6 +2669,26 @@
                         <input type="file" id="avatarFileInput" class="hidden-file-input" accept="image/*">
                         <button class="capsule-btn" id="uploadAvatarBtn">从本地导入头像</button>
                     </div>
+                    <div class="compression-info">
+                        头像将自动裁剪为正方形并以高清尺寸保存
+                    </div>
+                </div>
+
+                <!-- 用户头像设置 -->
+                <div class="setting-section">
+                    <h3>用户头像设置</h3>
+
+                    <div class="avatar-preview">
+                        <div class="avatar-wrapper avatar-lg">
+                            <div class="avatar" id="userAvatarPreview"></div>
+                        </div>
+                    </div>
+
+                    <div class="file-input-container">
+                        <input type="file" id="userAvatarFileInput" class="hidden-file-input" accept="image/*">
+                        <button class="capsule-btn" id="uploadUserAvatarBtn">从本地导入头像</button>
+                    </div>
+
                     <div class="compression-info">
                         头像将自动裁剪为正方形并以高清尺寸保存
                     </div>
@@ -2845,6 +2924,7 @@
         let appData = {
             currentFriendId: "friend1",
             userName: "用户",
+            userAvatarImage: null,   // ⭐ 新增：用户头像
             userStickers: [],
             friends: {
                 "friend1": {
@@ -2941,6 +3021,11 @@
         const avatarFileInput = document.getElementById('avatarFileInput');
         const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
         const avatarPreview = document.getElementById('avatarPreview');
+
+        // 用户头像相关元素
+        const userAvatarFileInput = document.getElementById('userAvatarFileInput');
+        const uploadUserAvatarBtn = document.getElementById('uploadUserAvatarBtn');
+        const userAvatarPreview = document.getElementById('userAvatarPreview');
 
         // 背景设置相关元素
         const chatBackgroundFileInput = document.getElementById('chatBackgroundFileInput');
@@ -3463,14 +3548,85 @@
                 fragment.appendChild(timeDivider);
             }
 
-            // ===== 消息容器 =====
+            // 1️⃣ 创建消息容器
             const messageContainer = document.createElement('div');
             messageContainer.className =
                 `message-container ${msg.sender}-container`;
 
+            /*// ===== 头像合并判断 =====
+            let showAvatar = true;
+
+            if (index > 0) {
+                const prevMsg = currentFriend.messages[index - 1];
+                if (prevMsg.sender === msg.sender) {
+                    showAvatar = false;
+                }
+            } 
+
+            // 2️⃣ 创建头像
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = `message-avatar ${msg.sender}-avatar`;
+
+            if (showAvatar) {
+                if (msg.sender === 'user') {
+                    if (appData.userAvatarImage) {
+                        const img = document.createElement('img');
+                        img.src = appData.userAvatarImage;
+                        avatarDiv.appendChild(img);
+                    } else {
+                        avatarDiv.textContent = appData.userName.charAt(0);
+                    }
+                } else {
+                    if (currentFriend.avatarImage) {
+                        const img = document.createElement('img');
+                        img.src = currentFriend.avatarImage;
+                        avatarDiv.appendChild(img);
+                    } else {
+                        avatarDiv.textContent =
+                            currentFriend.avatar || currentFriend.name.charAt(0);
+                    }
+                }
+            } else {
+                // ⭐ 关键：隐藏头像但保留占位
+                avatarDiv.style.visibility = 'hidden';
+            } */
+
+            // 2️⃣ 创建头像
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = `message-avatar ${msg.sender}-avatar`;
+
+            if (msg.sender === 'user') {
+                if (appData.userAvatarImage) {
+                    const img = document.createElement('img');
+                    img.src = appData.userAvatarImage;
+                    avatarDiv.appendChild(img);
+                } else {
+                    avatarDiv.textContent = appData.userName.charAt(0);
+                }
+            } else {
+                if (currentFriend.avatarImage) {
+                    const img = document.createElement('img');
+                    img.src = currentFriend.avatarImage;
+                    avatarDiv.appendChild(img);
+                } else {
+                    avatarDiv.textContent =
+                        currentFriend.avatar || currentFriend.name.charAt(0);
+                }
+            }
+
+            // 3️⃣ 创建 messageDiv（气泡）
             const messageDiv = document.createElement('div');
+
+            // 4️⃣ 判断是否无气泡
+            const isNoBubble =
+                msg.type === 'image' ||
+                msg.type === 'sticker';
+
+            // 5️⃣ 设置气泡 class
             messageDiv.className =
-                `message ${msg.sender}-message`;
+                `message ${msg.sender}-message` +
+                (isNoBubble ? ' no-bubble' : '');
+
             messageDiv.setAttribute('data-message-id', index);
 
             // ===== 有引用 =====
@@ -3521,9 +3677,16 @@
 
             messageDiv.addEventListener('click', handleMessageClick);
 
-            messageContainer.appendChild(messageDiv);
-            fragment.appendChild(messageContainer);
+            // 6️⃣ 按 sender 组合顺序
+            if (msg.sender === 'user') {
+                messageContainer.appendChild(messageDiv);
+                messageContainer.appendChild(avatarDiv);
+            } else {
+                messageContainer.appendChild(avatarDiv);
+                messageContainer.appendChild(messageDiv);
+            }
 
+            fragment.appendChild(messageContainer);
             return fragment;
         }
 
@@ -3707,6 +3870,23 @@
                 avatarPreview.innerHTML = `<img src="${currentFriend.avatarImage}" style="width: 100%; height: 100%; border-radius: 50%;">`;
             } else {
                 avatarPreview.textContent = currentFriend.avatar || currentFriend.name.charAt(0);
+            }
+
+            // ===== 用户头像预览（强制清空法）=====
+            userAvatarPreview.innerHTML = '';
+            userAvatarPreview.textContent = '';
+
+            if (appData.userAvatarImage) {
+                const img = document.createElement('img');
+                img.src = appData.userAvatarImage;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '50%';
+
+                userAvatarPreview.appendChild(img);
+            } else {
+                userAvatarPreview.textContent = appData.userName.charAt(0);
             }
 
             // 更新背景预览
@@ -4304,7 +4484,7 @@
             });
         }
 
-        // 上传头像
+        // 上传角色头像
         async function uploadAvatar(file) {
             if (!file) return;
 
@@ -4323,6 +4503,27 @@
             } catch (error) {
                 console.error("头像压缩失败:", error);
                 alert("头像上传失败，请重试");
+            }
+        }
+
+        async function uploadUserAvatar(file) {
+            if (!file) return;
+
+            try {
+                const compressedAvatar = await compressAvatar(file);
+                appData.userAvatarImage = compressedAvatar;
+
+                const saveResult = await saveData();
+                if (saveResult) {
+                    renderSettings();
+                    renderChat();
+                    alert("用户头像上传成功！");
+                } else {
+                    alert("用户头像上传失败，请重试");
+                }
+            } catch (error) {
+                console.error("用户头像压缩失败:", error);
+                alert("用户头像上传失败，请重试");
             }
         }
 
@@ -4818,7 +5019,7 @@
             }
         });
 
-        // 头像上传事件
+        // 角色头像上传事件
         uploadAvatarBtn.addEventListener('click', () => {
             avatarFileInput.click();
         });
@@ -4829,6 +5030,19 @@
                 const file = files[0];
                 uploadAvatar(file);
                 avatarFileInput.value = '';
+            }
+        });
+
+        uploadUserAvatarBtn.addEventListener('click', () => {
+            userAvatarFileInput.click();
+        });
+
+        userAvatarFileInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                uploadUserAvatar(file);
+                userAvatarFileInput.value = '';
             }
         });
 
