@@ -341,7 +341,7 @@
         }
 
         .chat-area {
-            --message-avatar-size: 39px;
+            --message-avatar-size: 28px;
             --message-avatar-gap: 10px;
         }
 
@@ -357,25 +357,25 @@
 
         .user-container {
             margin-left: auto;
-            margin-right: 10px;
+            margin-right: 5px;
             justify-content: flex-end;
         }
 
         .bot-container {
             margin-right: auto;
-            margin-left: 10px;
+            margin-left: 5px;
         }
 
         .message {
             display: inline-block;
 
-            padding: 10px 14px;
-            border-radius: 18px;
+            padding: 8px 12px;
+            border-radius: 15px;
             position: relative;
             animation: fadeIn 0.3s ease;
 
-            font-size: 13px;
-            line-height: 1.4;
+            font-size: 11px;
+            line-height: 1.35;
 
             max-width: calc(100% - var(--avatar-size) - var(--avatar-gap));
             white-space: pre-wrap;
@@ -421,7 +421,7 @@
             font-weight: 500;
             color: #fff;
 
-            transform: translateY(0.2px);
+            transform: translateY(1px);
         }
 
         /* 头像里的图片 */
@@ -3551,6 +3551,44 @@
             const messageContainer = document.createElement('div');
             messageContainer.className =
                 `message-container ${msg.sender}-container`;
+
+            /*// ===== 头像合并判断 =====
+            let showAvatar = true;
+
+            if (index > 0) {
+                const prevMsg = currentFriend.messages[index - 1];
+                if (prevMsg.sender === msg.sender) {
+                    showAvatar = false;
+                }
+            } 
+
+            // 2️⃣ 创建头像
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = `message-avatar ${msg.sender}-avatar`;
+
+            if (showAvatar) {
+                if (msg.sender === 'user') {
+                    if (appData.userAvatarImage) {
+                        const img = document.createElement('img');
+                        img.src = appData.userAvatarImage;
+                        avatarDiv.appendChild(img);
+                    } else {
+                        avatarDiv.textContent = appData.userName.charAt(0);
+                    }
+                } else {
+                    if (currentFriend.avatarImage) {
+                        const img = document.createElement('img');
+                        img.src = currentFriend.avatarImage;
+                        avatarDiv.appendChild(img);
+                    } else {
+                        avatarDiv.textContent =
+                            currentFriend.avatar || currentFriend.name.charAt(0);
+                    }
+                }
+            } else {
+                // ⭐ 关键：隐藏头像但保留占位
+                avatarDiv.style.visibility = 'hidden';
+            } */
 
             // 2️⃣ 创建头像
             const avatarDiv = document.createElement('div');
