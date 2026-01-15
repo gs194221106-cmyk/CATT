@@ -118,12 +118,12 @@
             top: 0;
             bottom: 22.67px;
 
-            left: 19px;
-            right: 19px;
+            left: 19.67px;
+            right: 19.67px;
 
             height: 60px;
             background: #ffffff;
-            border-radius: 19px;
+            border-radius: 14px;
 
             display: flex;
             align-items: center;
@@ -131,7 +131,9 @@
 
             padding-left: 31px;
 
-            box-shadow: 0 0 0 2px #fff, 0 2px 6px rgba(0, 0, 0, 0.05);
+            box-shadow:
+                0 0 0.8px rgba(0, 0, 0, 0.03),
+                0 0.5px 14px rgba(0, 0, 0, 0.04);
         }
 
         .header-left {
@@ -226,7 +228,7 @@
         }
 
         .chat-title {
-            font-size: 12.5px;
+            font-size: 12.3px;
             font-weight: 500;
             color: var(--header-text-color);
             line-height: 1.1;
@@ -496,7 +498,7 @@
         .input-area {
             position: relative;
             width: 100%;
-            height: 122px;
+            height: 108px;
             /* 👈 这里，88 → 96 */
             background: #ffffff;
             box-shadow: inset 0 0.5px 1px rgba(0, 0, 0, 0.05);
@@ -518,7 +520,7 @@
             left: 0;
             right: 0;
 
-            bottom: 51.7px;
+            bottom: 34px;
             /* 209 ÷ 3 */
 
             display: flex;
@@ -763,40 +765,10 @@
             padding: 0;
         }
 
-        /* ===== Home Indicator 上方的文本标签 ===== */
-        .input-footer-label {
-            position: fixed;
-
-            bottom: 19.2px;
-            /* ≈ 89 / 3，保留你的视觉定位 */
-            left: 0;
-            right: 0;
-
-            height: 24px;
-            /* 字体高度参考，保留 */
-            line-height: 24px;
-
-            text-align: center;
-
-            font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-            font-weight: 600;
-            /* SemiBold（第一推荐） */
-            font-style: normal;
-
-            font-size: 11px;
-            letter-spacing: 0.2px;
-            /* 比 TOOL 稍微收一点，更像 Eina 01 */
-            color: #bdbdbd;
-
-            background: transparent;
-            pointer-events: none;
-
-            z-index: 5;
-        }
 
         /* 修改：输入栏placeholder字体大小 */
         .message-input::placeholder {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--wechat-time);
         }
 
@@ -2442,11 +2414,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Home Indicator 上方的静态标签 -->
-        <div class="input-footer-label">
-            • Have a nice day •
         </div>
 
         <!-- =========================
