@@ -117,7 +117,7 @@
         .header-center {
             position: absolute;
             left: 50%;
-            top: 45%;
+            top: 42%;
             transform: translate(-50%, -50%);
 
             /* 不再用 flex 布局左右 */
@@ -131,8 +131,8 @@
         }
 
         .header-left-btn {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
 
             display: flex;
             align-items: center;
@@ -145,6 +145,7 @@
             color: #1E1E1E;
             /* 控制爱心颜色 */
             cursor: pointer;
+            transform: translateY(-3px);
         }
 
         .header-left-btn:active {
@@ -160,7 +161,7 @@
 
         .chat-info-left {
             position: absolute;
-            right: calc(100% - 12px);
+            right: calc(100% - 11px);
             top: 12%;
             transform: translateY(-50%);
             z-index: 3;
@@ -178,8 +179,8 @@
         /* 用于承载头像 + 在线点（不参与布局） */
         .avatar-wrapper {
             position: relative;
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             z-index: 2;
         }
 
@@ -290,7 +291,7 @@
             font-weight: 400;
             line-height: 1;
 
-            color: var(--header-text-color);
+            color: #292929;
             background: #ffffff;
 
             border: 1px solid rgba(0, 0, 0, 0.05);
@@ -325,6 +326,7 @@
             color: #1E1E1E;
             /* 默认颜色 */
             cursor: pointer;
+            transform: translateY(-4px);
         }
 
         .settings-btn:active {
