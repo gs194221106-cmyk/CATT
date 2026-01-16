@@ -99,65 +99,88 @@
 
 
         /* =========================
-   头部外壳（不含系统状态栏）
-   ========================= */
-        .header-card {
-            position: relative;
-            width: 100%;
-            height: 75px;
-            background: #ffffff;
-            box-shadow: inset 0 -0.5px 1px rgba(0, 0, 0, 0.05);
-            flex-shrink: 0;
-        }
-
-        /* =========================
    头部 - 角色状态栏
    ========================= */
         .header {
-            position: absolute;
-            top: 0;
-            bottom: 22.67px;
-
-            left: 19.67px;
-            right: 19.67px;
-
-            height: 60px;
+            position: relative;
+            width: 100%;
+            height: 65px;
             background: #ffffff;
-            border-radius: 14px;
 
             display: flex;
             align-items: center;
             justify-content: space-between;
 
-            padding-left: 31px;
+            box-shadow: inset 0 -0.5px 1px rgba(0, 0, 0, 0.05);
+        }
 
-            box-shadow:
-                0 0 0.8px rgba(0, 0, 0, 0.03),
-                0 0.5px 14px rgba(0, 0, 0, 0.04);
+        .header-center {
+            position: absolute;
+            left: 50%;
+            top: 45%;
+            transform: translate(-50%, -50%);
+
+            /* 不再用 flex 布局左右 */
+            pointer-events: auto;
         }
 
         .header-left {
+            padding-left: 31px;
             display: flex;
             align-items: center;
-            flex: 1;
+        }
+
+        .header-left-btn {
+            width: 12px;
+            height: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: transparent;
+            border: none;
+            padding: 0;
+
+            color: #1E1E1E;
+            /* 控制爱心颜色 */
+            cursor: pointer;
+        }
+
+        .header-left-btn:active {
+            transform: scale(0.94);
+            opacity: 0.7;
+        }
+
+        .header-left-icon {
+            width: 22px;
+            height: 22px;
+            display: block;
+        }
+
+        .chat-info-left {
+            position: absolute;
+            right: calc(100% - 12px);
+            top: 12%;
+            transform: translateY(-50%);
+            z-index: 3;
         }
 
         /* =========================
    头像 + 状态整体容器
    ========================= */
         .avatar-container {
+            position: relative;
             display: flex;
-            align-items: center;
-            cursor: pointer;
+            justify-content: center;
         }
 
         /* 用于承载头像 + 在线点（不参与布局） */
         .avatar-wrapper {
             position: relative;
-            width: 37px;
-            height: 37px;
-            margin-right: 10px;
-            /* ✅ 头像与文字的真实间距 */
+            width: 48px;
+            height: 48px;
+            z-index: 2;
         }
 
         /* =========================
@@ -216,95 +239,102 @@
             box-shadow: 0 0 0.5px rgba(0, 0, 0, 0.25);
         }
 
+        .chat-info-right {
+            position: absolute;
+            left: calc(100% + 8px);
+            top: 68%;
+            transform: translateY(-50%);
+        }
 
-        /* =========================
-   角色信息文字
-   ========================= */
         .chat-info {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            transform: translateY(0.73px);
+            align-items: center;
+
+            /* 微调基线即可，不再做纵向布局 */
+            transform: translateY(0.5px);
         }
 
         .chat-title {
-            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+
+            padding: 4px 10px;
+
+            font-size: 7.5px;
             font-weight: 500;
+            line-height: 1;
+
             color: var(--header-text-color);
-            line-height: 1.1;
-            margin-bottom: 1.1px;
-            text-shadow: var(--header-text-shadow);
+
+            background: #ffffff;
+
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            /* 极细描边 */
+
+            border-radius: 9999px;
+
+            /* Figma 同款轻阴影 */
+            box-shadow:
+                5px 5px 25px 2px rgba(0, 0, 0, 0.05);
+
+            white-space: nowrap;
         }
 
         .chat-status {
+            display: inline-flex;
+            align-items: center;
+
+            padding: 2.5px 9px;
+
             font-size: 7px;
-            line-height: 1.3;
-            color: var(--header-status-color);
-            text-shadow: var(--header-text-shadow);
+            font-weight: 400;
+            line-height: 1;
+
+            color: var(--header-text-color);
+            background: #ffffff;
+
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+
+            box-shadow: 5px 5px 25px 2px rgba(0, 0, 0, 0.02);
+
+            white-space: nowrap;
         }
 
         /* =========================
    右侧按钮
    ========================= */
         .header-right {
+            padding-right: 25px;
             display: flex;
             align-items: center;
-            margin-right: 27px;
         }
 
         .settings-btn {
-            position: relative;
-            overflow: visible;
-
-            width: 30px;
-            height: 24px;
-
-            background: #000;
-            border: none;
-            border-radius: 6px;
+            width: 18px;
+            height: 18px;
 
             display: flex;
             align-items: center;
             justify-content: center;
 
+            background: transparent;
+            border: none;
+            padding: 0;
+
+            color: #1E1E1E;
+            /* 默认颜色 */
             cursor: pointer;
-            z-index: 1;
         }
 
-        /* 爱心 */
-        .settings-btn::before {
-            content: "♥";
-            color: #fff;
-            font-size: 11px;
-            line-height: 1;
-
-            position: relative;
-            z-index: 2;
+        .settings-btn:active {
+            transform: scale(0.94);
+            opacity: 0.7;
         }
 
-        /* ↓↓↓ 真正“自然长出来”的尾巴 ↓↓↓ */
-        .settings-btn::after {
-            content: "";
-            position: absolute;
-
-            left: 50%;
-            bottom: -1px;
-            /* 吃进按钮一点 */
-
-            width: 12px;
-            height: 12px;
-
-            background: #000;
-
-            transform:
-                translateX(-50%) rotate(45deg);
-
-            border-radius: 3px;
-            /* ✅ 所有角都是真的圆 */
-
-            z-index: -1;
-            /* ✅ 必须在按钮下面 */
-            pointer-events: none;
+        .settings-icon {
+            width: 22px;
+            height: 22px;
         }
 
         .chat-wrapper {
@@ -2344,37 +2374,65 @@
     <div class="overlay" id="overlay"></div>
     <div class="container" id="mainContainer">
 
-        <!-- 顶部 Header（只放 header） -->
-        <div class="header-card">
-            <div class="header">
-                <div class="header-left">
-                    <div class="avatar-container" id="avatarContainer">
+        <div class="header">
 
-                        <!-- 头像 + 在线状态包裹 -->
-                        <div class="avatar-wrapper">
-                            <div class="avatar" id="botAvatar">
-                                <!-- 头像图片将在这里显示 -->
-                            </div>
+            <!-- 左侧按钮（占位） -->
+            <div class="header-left">
+                <button class="header-left-btn" aria-label="like">
+                    <svg class="header-left-icon" width="24" height="24" viewBox="0 0 40 40" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M34.7333 7.68332C33.8821 6.83166 32.8714 6.15607 31.7589 5.69513C30.6465 5.23419 29.4541 4.99695 28.25 4.99695C27.0459 4.99695 25.8535 5.23419 24.7411 5.69513C23.6286 6.15607 22.6179 6.83166 21.7667 7.68332L20 9.44999L18.2333 7.68332C16.5138 5.96384 14.1817 4.99784 11.75 4.99784C9.31827 4.99784 6.98615 5.96384 5.26666 7.68332C3.54717 9.40281 2.58118 11.7349 2.58118 14.1667C2.58118 16.5984 3.54717 18.9305 5.26666 20.65L20 35.3833L34.7333 20.65C35.585 19.7987 36.2606 18.788 36.7215 17.6756C37.1825 16.5632 37.4197 15.3708 37.4197 14.1667C37.4197 12.9625 37.1825 11.7702 36.7215 10.6577C36.2606 9.5453 35.585 8.53458 34.7333 7.68332Z"
+                            fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
 
-                            <!-- 在线状态点 -->
-                            <span class="online-status"></span>
-                        </div>
+            <!-- 中心区域（绝对居中锚点） -->
+            <div class="header-center">
 
-                        <div class="chat-info">
-                            <div class="chat-title" id="botName">聊天伙伴</div>
-                            <div class="chat-status" id="chatStatus">在线</div>
-                        </div>
+                <div class="avatar-container" id="avatarContainer">
+
+                    <!-- 角色信息（左侧） -->
+                    <div class="chat-info chat-info-left">
+                        <div class="chat-title" id="botName">聊天伙伴</div>
                     </div>
-                </div>
 
-                <div class="header-right">
-                    <button class="settings-btn">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
+                    <!-- 头像 + 状态点（真正中心锚点） -->
+                    <div class="avatar-wrapper">
+                        <div class="avatar" id="botAvatar"></div>
+                        <span class="online-status"></span>
+                    </div>
+
+                    <!-- 状态文字（右侧） -->
+                    <div class="chat-info chat-info-right">
+                        <div class="chat-status" id="chatStatus">online</div>
+                    </div>
+
                 </div>
             </div>
+
+            <!-- 右侧：设置按钮 -->
+            <div class="header-right">
+                <button class="settings-btn" aria-label="settings">
+                    <svg class="settings-icon" width="24" height="24" viewBox="0 0 67 67" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M33.5 36.2917C35.0418 36.2917 36.2917 35.0418 36.2917 33.5C36.2917 31.9582 35.0418 30.7084 33.5 30.7084C31.9582 30.7084 30.7083 31.9582 30.7083 33.5C30.7083 35.0418 31.9582 36.2917 33.5 36.2917Z"
+                            stroke="currentColor" stroke-width="5.58333" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path
+                            d="M33.5 16.75C35.0418 16.75 36.2917 15.5001 36.2917 13.9584C36.2917 12.4166 35.0418 11.1667 33.5 11.1667C31.9582 11.1667 30.7083 12.4166 30.7083 13.9584C30.7083 15.5001 31.9582 16.75 33.5 16.75Z"
+                            stroke="currentColor" stroke-width="5.58333" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path
+                            d="M33.5 55.8334C35.0418 55.8334 36.2917 54.5835 36.2917 53.0417C36.2917 51.4999 35.0418 50.25 33.5 50.25C31.9582 50.25 30.7083 51.4999 30.7083 53.0417C30.7083 54.5835 31.9582 55.8334 33.5 55.8334Z"
+                            stroke="currentColor" stroke-width="5.58333" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+
         </div>
 
 
@@ -3179,7 +3237,7 @@
                     renderSettings();
 
                     // 重置状态栏为在线
-                    chatStatus.textContent = "在线";
+                    chatStatus.textContent = "online";
 
                     // 重新启动所有好友的主动发送（如果开启）
                     restartAllActiveSending();
@@ -3200,7 +3258,7 @@
             renderSettings();
 
             // 重置状态栏为在线
-            chatStatus.textContent = "在线";
+            chatStatus.textContent = "online";
 
             // 启动所有好友的主动发送（如果开启）
             restartAllActiveSending();
@@ -3376,9 +3434,9 @@
             // 检查当前好友是否有正在处理的任务队列
             if (isProcessingQueues[currentFriendId] ||
                 (replyTaskQueues[currentFriendId] && replyTaskQueues[currentFriendId].length > 0)) {
-                chatStatus.textContent = "对方正在输入...";
+                chatStatus.textContent = "typing";
             } else {
-                chatStatus.textContent = "在线";
+                chatStatus.textContent = "online";
             }
         }
 
@@ -3971,7 +4029,7 @@
 
             // 更新状态为"正在输入"
             if (appData.currentFriendId === friendId) {
-                chatStatus.textContent = "对方正在输入...";
+                chatStatus.textContent = "typing";
             }
 
             // 如果当前没有在处理队列，开始处理
@@ -4057,7 +4115,7 @@
 
                 // 更新状态为在线
                 if (appData.currentFriendId === friendId) {
-                    chatStatus.textContent = "在线";
+                    chatStatus.textContent = "onilne";
                 }
                 return;
             }
@@ -4372,7 +4430,7 @@
 
             // 更新状态为"正在输入"
             if (appData.currentFriendId === friendId) {
-                chatStatus.textContent = "对方正在输入...";
+                chatStatus.textContent = "typing";
             }
 
             // 如果当前没有在处理队列，开始处理
