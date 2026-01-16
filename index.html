@@ -125,7 +125,7 @@
         }
 
         .header-left {
-            padding-left: 31px;
+            padding-left: 40px;
             display: flex;
             align-items: center;
         }
@@ -142,11 +142,14 @@
             border: none;
             padding: 0;
 
-            color: #1E1E1E;
+            color: #424242;
             /* 控制爱心颜色 */
             cursor: pointer;
-            transform: translateY(-3px);
+            transform: translateY(-2px);
+
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.16));
         }
+
 
         .header-left-btn:active {
             transform: scale(0.94);
@@ -171,7 +174,7 @@
             position: absolute;
             width: 12.5px;
             height: 12.5px;
-            left: -45px;
+            left: -43px;
             /* 距离头像 */
             top: 84%;
             transform: translateY(-50%);
@@ -186,7 +189,7 @@
             /* 不抢点击 */
         }
 
-       /* .voice-icon path {
+        /* .voice-icon path {
             stroke: currentColor;
             stroke-width: 3.25;
             stroke-linecap: round;
@@ -304,7 +307,7 @@
 
         .chat-info-right {
             position: absolute;
-            left: calc(100% + 8px);
+            left: calc(100% + 14px);
             top: 68%;
             transform: translateY(-50%);
         }
@@ -368,7 +371,7 @@
    右侧按钮
    ========================= */
         .header-right {
-            padding-right: 25px;
+            padding-right: 26px;
             display: flex;
             align-items: center;
         }
@@ -3310,7 +3313,7 @@
                     renderSettings();
 
                     // 重置状态栏为在线
-                    chatStatus.textContent = "online";
+                    chatStatus.textContent = "OnLine";
 
                     // 重新启动所有好友的主动发送（如果开启）
                     restartAllActiveSending();
@@ -3331,7 +3334,7 @@
             renderSettings();
 
             // 重置状态栏为在线
-            chatStatus.textContent = "online";
+            chatStatus.textContent = "OnLine";
 
             // 启动所有好友的主动发送（如果开启）
             restartAllActiveSending();
@@ -3507,9 +3510,9 @@
             // 检查当前好友是否有正在处理的任务队列
             if (isProcessingQueues[currentFriendId] ||
                 (replyTaskQueues[currentFriendId] && replyTaskQueues[currentFriendId].length > 0)) {
-                chatStatus.textContent = "typing";
+                chatStatus.textContent = "Typing💬";
             } else {
-                chatStatus.textContent = "online";
+                chatStatus.textContent = "OnLine";
             }
         }
 
@@ -4102,7 +4105,7 @@
 
             // 更新状态为"正在输入"
             if (appData.currentFriendId === friendId) {
-                chatStatus.textContent = "typing";
+                chatStatus.textContent = "Typing💬";
             }
 
             // 如果当前没有在处理队列，开始处理
@@ -4503,7 +4506,7 @@
 
             // 更新状态为"正在输入"
             if (appData.currentFriendId === friendId) {
-                chatStatus.textContent = "typing";
+                chatStatus.textContent = "Tping💬";
             }
 
             // 如果当前没有在处理队列，开始处理
