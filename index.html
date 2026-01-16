@@ -167,6 +167,68 @@
             z-index: 3;
         }
 
+        .voice-indicator {
+            position: absolute;
+            width: 12.5px;
+            height: 12.5px;
+            left: -45px;
+            /* 距离头像 */
+            top: 84%;
+            transform: translateY(-50%);
+
+            color: rgba(0, 0, 0, 0.45);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            pointer-events: none;
+            /* 不抢点击 */
+        }
+
+       /* .voice-icon path {
+            stroke: currentColor;
+            stroke-width: 3.25;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+
+            transform-box: fill-box;
+            
+            transform-origin: top center;
+           
+
+            animation: voiceWave 1.2s ease-in-out infinite;
+        }
+
+        .voice-icon path:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .voice-icon path:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .voice-icon path:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes voiceWave {
+            0% {
+                opacity: 0.4;
+                transform: scaleY(0.6);
+            }
+
+            50% {
+                opacity: 0.9;
+                transform: scaleY(1);
+            }
+
+            100% {
+                opacity: 0.4;
+                transform: scaleY(0.6);
+            }
+        }*/
+
         /* =========================
    头像 + 状态整体容器
    ========================= */
@@ -2394,7 +2456,16 @@
             <div class="header-center">
 
                 <div class="avatar-container" id="avatarContainer">
-
+                    <!-- 左侧：活动状态图标 -->
+                    <div class="voice-indicator">
+                        <svg class="voice-icon" width="18" height="18" viewBox="0 0 46 46" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path d="M34.5 38.3334V19.1667
+                   M23 38.3334V7.66669
+                   M11.5 38.3334V26.8334" stroke="currentColor" stroke-width="3.25" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
                     <!-- 角色信息（左侧） -->
                     <div class="chat-info chat-info-left">
                         <div class="chat-title" id="botName">聊天伙伴</div>
