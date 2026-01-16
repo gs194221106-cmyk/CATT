@@ -104,7 +104,7 @@
         .header {
             position: relative;
             width: 100%;
-            height: 65px;
+            height: 70px;
             background: #ffffff;
 
             display: flex;
@@ -125,7 +125,7 @@
         }
 
         .header-left {
-            padding-left: 40px;
+            padding-left: 58px;
             display: flex;
             align-items: center;
         }
@@ -145,7 +145,7 @@
             color: #424242;
             /* 控制爱心颜色 */
             cursor: pointer;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
 
             filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.16));
         }
@@ -174,9 +174,9 @@
             position: absolute;
             width: 12.5px;
             height: 12.5px;
-            left: -43px;
+            left: -44px;
             /* 距离头像 */
-            top: 84%;
+            top: 84.5%;
             transform: translateY(-50%);
 
             color: rgba(0, 0, 0, 0.45);
@@ -307,7 +307,7 @@
 
         .chat-info-right {
             position: absolute;
-            left: calc(100% + 14px);
+            left: calc(100% + 11.5px);
             top: 68%;
             transform: translateY(-50%);
         }
@@ -371,7 +371,7 @@
    右侧按钮
    ========================= */
         .header-right {
-            padding-right: 26px;
+            padding-right: 46px;
             display: flex;
             align-items: center;
         }
@@ -2482,7 +2482,7 @@
 
                     <!-- 状态文字（右侧） -->
                     <div class="chat-info chat-info-right">
-                        <div class="chat-status" id="chatStatus">online</div>
+                        <div class="chat-status" id="chatStatus">OnLine</div>
                     </div>
 
                 </div>
@@ -4506,7 +4506,7 @@
 
             // 更新状态为"正在输入"
             if (appData.currentFriendId === friendId) {
-                chatStatus.textContent = "Tping💬";
+                chatStatus.textContent = "Typing💬";
             }
 
             // 如果当前没有在处理队列，开始处理
