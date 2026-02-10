@@ -694,7 +694,7 @@
         .tool-panel {
             position: fixed;
             /* 🔥 改这里：出生点 */
-            top: 23%;
+            top: 17%;
             left: 67%;
             transform: translate(-50%, -50%);
             /* ↑ 从“中心点”出生，而不是底部 */
@@ -867,6 +867,40 @@
         .message-input::placeholder {
             font-size: 12px;
             color: var(--wechat-time);
+        }
+
+        /*图片大小 放大预览*/
+        .chat-image-thumb {
+            width: 120px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .image-preview {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .image-preview img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+
+        /*表情包消息记录预览*/
+        .chat-sticker {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            border-radius: 10px;
+            cursor: pointer;
         }
 
         /* 设置面板 - 修改：全屏白色背景 */
@@ -1608,7 +1642,7 @@
             backdrop-filter: blur(12px);
 
             border-radius: 20px;
-            padding: 12px;
+            padding: 12px 12px 12px 29px;
 
             height: 160px;
             /* 比你原来 150 略大一点 */
@@ -2130,15 +2164,6 @@
             padding: 8px;
         }
 
-        /* 新增：引用消息中的图片样式 */
-        .quoted-image {
-            max-width: 60px;
-            max-height: 60px;
-            border-radius: 4px;
-            margin-top: 4px;
-            object-fit: cover;
-        }
-
         /* 新增：批量字卡输入弹窗样式 */
         .batch-phrase-popup {
             position: fixed;
@@ -2409,7 +2434,8 @@
         /* ===== 引用中的图片 / 表情包：强制缩略图限高（最终版） ===== */
         .quoted-content .quoted-text img.quoted-image {
             max-height: 64px !important;
-            max-width: 96px !important;
+            max-width: 64px !important;
+            /* 🔥 只改这里 */
             width: auto !important;
             height: auto !important;
             object-fit: cover;
@@ -3000,10 +3026,10 @@
             消息内容已复制到剪贴板！
         </div>
 
-        <!-- 消息操作菜单 -->
-        <div class="message-action-menu" id="messageActionMenu">
-            <button class="action-menu-item" id="copyMessageBtn">复制</button>
+        <div class="image-preview hidden" id="imagePreview">
+            <img id="imagePreviewImg">
         </div>
+
     </div>
 
     <!-- JavaScript 代码 -->
@@ -3109,12 +3135,6 @@
         const optimizationInfo = document.getElementById('optimizationInfo');
         const indexeddbStatus = document.getElementById('indexeddbStatus');
 
-        // 消息操作菜单相关元素
-        const messageActionMenu = document.getElementById('messageActionMenu');
-        const copyMessageBtn = document.getElementById('copyMessageBtn');
-
-        // 当前选中的消息
-        let currentSelectedMessage = null;
 
         // 头像设置相关元素
         const avatarFileInput = document.getElementById('avatarFileInput');
@@ -3595,16 +3615,30 @@
                 container.textContent = msg.content;
 
             } else if (msg.type === 'image') {
-                container.innerHTML =
-                    `<img src="${msg.content}" style="max-width:200px;border-radius:5px;">`;
+                const img = document.createElement('img');
+                img.src = msg.content;
+                img.className = 'chat-image-thumb';
+
+                img.addEventListener('click', () => {
+                    openImagePreview(msg.content);
+                });
+
+                container.appendChild(img);
 
             } else if (msg.type === 'emoji') {
                 container.innerHTML =
                     `<div style="font-size:13px;line-height:1.4;">${msg.content}</div>`;
 
             } else if (msg.type === 'sticker') {
-                container.innerHTML =
-                    `<img src="${msg.content}" style="max-width:100px;border-radius:5px;">`;
+                const img = document.createElement('img');
+                img.src = msg.content;
+                img.className = 'chat-sticker'; // ✅ 改这里
+
+                img.addEventListener('click', () => {
+                    openImagePreview(msg.content, 'sticker');
+                });
+
+                container.appendChild(img);
             }
         }
 
@@ -3768,13 +3802,29 @@
                 messageWithQuote.appendChild(quotedContent);
                 messageWithQuote.appendChild(mainContent);
                 messageDiv.appendChild(messageWithQuote);
+                // ===== 让「引用消息里的图片 / 表情包」可点击预览 =====
+                const quotedImgs = quotedContent.querySelectorAll('img');
+
+                quotedImgs.forEach(img => {
+                    img.style.cursor = 'pointer';
+
+                    img.addEventListener('click', (e) => {
+                        e.stopPropagation(); // 不影响外层消息
+
+                        const isSticker = msg.quoteType === 'sticker';
+
+                        openImagePreview(
+                            img.src,
+                            isSticker ? 'sticker' : 'image'
+                        );
+                    });
+                });
 
             } else {
                 // ===== 无引用 =====
                 renderMessageContent(messageDiv, msg);
             }
 
-            messageDiv.addEventListener('click', handleMessageClick);
 
             // 6️⃣ 按 sender 组合顺序
             if (msg.sender === 'user') {
@@ -3820,32 +3870,6 @@
 
             // 全量渲染完，直接滚到底
             chatArea.scrollTop = chatArea.scrollHeight;
-        }
-
-        // 点击消息事件处理
-        function handleMessageClick(e) {
-            const messageDiv = e.currentTarget;
-            const messageId = parseInt(messageDiv.getAttribute('data-message-id'));
-            const currentFriend = getCurrentFriend();
-            const message = currentFriend.messages[messageId];
-
-            // 保存当前消息信息
-            currentSelectedMessage = {
-                id: messageId,
-                sender: message.sender === 'user' ? appData.userName : currentFriend.name,
-                content: message.content
-            };
-
-            // 获取消息元素位置
-            const rect = messageDiv.getBoundingClientRect();
-
-            // 设置菜单位置
-            messageActionMenu.style.top = `${rect.top - 35}px`;
-            messageActionMenu.style.left = `${rect.left}px`;
-            messageActionMenu.style.display = 'flex';
-
-            // 阻止事件冒泡
-            e.stopPropagation();
         }
 
         // 计算时间差（分钟）——保持不变
@@ -3942,6 +3966,19 @@
 
         dragHandle.addEventListener("pointercancel", () => {
             isDragging = false;
+        });
+
+        //图片放大预览。
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewImg = document.getElementById('imagePreviewImg');
+
+        function openImagePreview(src) {
+            imagePreviewImg.src = src;
+            imagePreview.classList.remove('hidden');
+        }
+
+        imagePreview.addEventListener('click', () => {
+            imagePreview.classList.add('hidden');
         });
 
         // 渲染设置界面
@@ -4048,7 +4085,6 @@
                 `;
                 imgElement.addEventListener('click', () => {
                     sendMessage(sticker, 'sticker');
-                    stickerPicker.classList.add('hidden');
                 });
                 stickerPicker.appendChild(imgElement);
             });
@@ -5159,17 +5195,6 @@
             }
         });
 
-        // 消息操作菜单事件
-        copyMessageBtn.addEventListener('click', () => {
-            if (currentSelectedMessage) {
-                copyToClipboard(currentSelectedMessage.content);
-                copySuccess.style.display = 'block';
-                setTimeout(() => {
-                    copySuccess.style.display = 'none';
-                }, 2000);
-            }
-            messageActionMenu.style.display = 'none';
-        });
 
         // 主题切换按钮事件
         lightThemeBtn.addEventListener('click', () => {
@@ -5193,9 +5218,6 @@
 
         // 点击其他地方隐藏消息操作菜单
         document.addEventListener('click', (e) => {
-            if (!messageActionMenu.contains(e.target) && !e.target.classList.contains('message')) {
-                messageActionMenu.style.display = 'none';
-            }
 
             // 字卡编辑和删除按钮事件处理（设置界面中的）
             if (e.target.classList.contains('phrase-edit-btn')) {
@@ -5319,7 +5341,10 @@
             }
         }, { passive: false });
 
-        if ('serviceWorker' in navigator) {
+        // 离线缓存开关（开发期一定是 false）
+        const ENABLE_SW = true;
+
+        if (ENABLE_SW && 'serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
                     .then(reg => {
