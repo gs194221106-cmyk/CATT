@@ -547,6 +547,122 @@
             margin-right: var(--message-avatar-gap);
         }
 
+        /* =========================
+   语音内容行（不控制高度）
+========================= */
+        .voice-content {
+            display: inline-flex;
+            align-items: center;
+
+            padding: 0 12px;
+            box-sizing: border-box;
+
+            /* ✅ 关键：内容靠右 */
+            justify-content: flex-end;
+
+            white-space: nowrap;
+        }
+
+        /* =========================
+   秒数（左）
+========================= */
+        .voice-duration {
+            font-size: 10px;
+            line-height: 1;
+            /* 只影响自身 */
+            margin-right: 6px;
+            white-space: nowrap;
+            color: #333;
+        }
+
+        /* =========================
+   声波图标容器
+========================= */
+        .voice-wave-icon {
+            display: inline-flex;
+            align-items: center;
+            line-height: 0;
+        }
+
+        /* =========================
+   SVG 声波本体
+========================= */
+        .voice-svg {
+            display: block;
+            /* ⭐ 不参与行高计算 */
+            width: 24px;
+            height: 18px;
+        }
+
+        /* =========================
+   声波样式
+========================= */
+        .voice-svg .wave {
+            fill: none;
+            stroke: #333;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .voice-svg .w1 {
+            opacity: 0.6;
+        }
+
+        .voice-svg .w2 {
+            opacity: 0.8;
+        }
+
+        .voice-svg .w3 {
+            opacity: 1;
+        }
+
+        /* =========================
+   朝左 (((
+========================= */
+        .flip-left {
+            transform: scaleX(-1);
+            transform-origin: center;
+        }
+
+
+        /* ===== 播放动画（微信风）===== */
+        .voice-content.playing .wave {
+            opacity: 0.3;
+            animation: waveBlink 1s infinite ease-in-out;
+        }
+
+        .voice-content.playing .w1 {
+            animation-delay: 0s;
+        }
+
+        .voice-content.playing .w2 {
+            animation-delay: 0.15s;
+        }
+
+        .voice-content.playing .w3 {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes waveBlink {
+            0% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.3;
+            }
+        }
+
+        /* 失效语音 */
+        .voice-content.voice-invalid {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
         .user-message {
             background-color: var(--bubble-user);
             color: var(--wechat-text);
@@ -657,6 +773,8 @@
             stroke-linecap: round;
             stroke-linejoin: round;
         }
+
+
 
         /* ===== TOOL 标签（悬浮在输入框上方，不随多行变化） ===== */
         .tool-label {
@@ -3039,11 +3157,11 @@
         // Voice Record Global State
         // ==========================
         let lastRenderedDate = null;
-        //let mediaRecorder = null;
-        //let audioChunks = [];
-        //let recordStartTime = 0;
-        //let recordStream = null; // ✅ 新增：保存 stream
-        //let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordStartTime = 0;
+        let recordStream = null; // ✅ 新增：保存 stream
+        let isRecording = false;
 
         // 初始化数据
         let appData = {
@@ -3077,7 +3195,7 @@
         const chatArea = document.getElementById('chatArea');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
-        // const voiceBtn = document.getElementById('voiceBtn'); // 👈 就加在这一堆里
+        const voiceBtn = document.getElementById('voiceBtn'); // 👈 就加在这一堆里
         const settingsBtn = document.querySelector('.settings-btn');
         const settingsPanel = document.getElementById('settingsPanel');
         const closeSettings = document.querySelector('.close-settings');
@@ -3632,13 +3750,16 @@
             } else if (msg.type === 'sticker') {
                 const img = document.createElement('img');
                 img.src = msg.content;
-                img.className = 'chat-sticker'; // ✅ 改这里
+                img.className = 'chat-sticker';
 
                 img.addEventListener('click', () => {
                     openImagePreview(msg.content, 'sticker');
                 });
 
                 container.appendChild(img);
+
+            } else if (msg.type === 'voice') {
+                renderVoiceContent(container, msg);
             }
         }
 
@@ -4090,9 +4211,126 @@
             });
         }
 
+        //开始录音。
+        async function startVoiceRecord() {
+            try {
+                recordStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                let options = {};
+
+                if (MediaRecorder.isTypeSupported('audio/mp4;codecs=mp4a.40.2')) {
+                    options = { mimeType: 'audio/mp4;codecs=mp4a.40.2' };
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    options = { mimeType: 'audio/mp4' };
+                } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    options = { mimeType: 'audio/webm;codecs=opus' };
+                } else {
+                    options = { mimeType: 'audio/webm' };
+                }
+
+                mediaRecorder = new MediaRecorder(recordStream, options);
+
+                audioChunks = [];
+                recordStartTime = Date.now();
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data && e.data.size > 0) {
+                        audioChunks.push(e.data);
+                    }
+                };
+
+                mediaRecorder.start();
+
+            } catch (err) {
+                console.error('麦克风权限被拒绝', err);
+                isRecording = false;
+                alert('需要麦克风权限才能录音');
+            }
+        }
+
+
+        //停止录音。
+        function stopVoiceRecord() {
+            return new Promise((resolve, reject) => {
+                if (!mediaRecorder) {
+                    reject('mediaRecorder 不存在');
+                    return;
+                }
+
+                mediaRecorder.onstop = async () => {
+                    try {
+                        const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+                        const base64Audio = await blobToBase64(blob);
+
+                        const duration = Math.max(
+                            1,
+                            Math.round((Date.now() - recordStartTime) / 1000)
+                        );
+
+                        if (recordStream) {
+                            recordStream.getTracks().forEach(track => track.stop());
+                            recordStream = null;
+                        }
+
+                        mediaRecorder = null;
+                        audioChunks = [];
+
+                        resolve({
+                            sender: 'user',
+                            type: 'voice',
+                            content: {
+                                audio: base64Audio,
+                                duration
+                            },
+                            timestamp: Date.now()
+                        });
+
+                    } catch (err) {
+                        reject(err);
+                    }
+                };
+
+                mediaRecorder.stop();
+            });
+        }
+
+        //点击/生成语音对象消息。
+        voiceBtn.addEventListener('click', async () => {
+            if (!isRecording) {
+                isRecording = true;
+                await startVoiceRecord();
+            } else {
+                isRecording = false;
+
+                try {
+                    const msg = await stopVoiceRecord();
+
+                    const friend = appData.friends[appData.currentFriendId];
+                    friend.messages.push(msg);
+
+                    await saveData();
+                    addMessageToChat(msg);
+
+                    createReplyTask(friend.id, msg);
+
+                } catch (e) {
+                    console.warn('录音失败', e);
+                    alert('录音失败，请重试');
+                }
+            }
+        });
+        //转格式。
+        function blobToBase64(blob) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        }
+
         // 发送消息
         async function sendMessage(content, type = 'text') {
-            if (!content.trim() && type !== 'image' && type !== 'sticker' && type !== 'sticker') return;
+            if (!content.trim() && type !== 'image' && type !== 'sticker' && type !== 'voice') return;
 
             const currentFriend = getCurrentFriend();
 
@@ -4335,6 +4573,72 @@
             });
         }
 
+        // 添加语音（最终稳定版）
+        function renderVoiceContent(container, msg) {
+            const voiceContent = document.createElement('div');
+            voiceContent.className = 'voice-content';
+            voiceContent.style.width = '85px';
+
+            const duration = document.createElement('span');
+            duration.className = 'voice-duration';
+            duration.textContent = msg.content.duration + '"';
+
+            const icon = document.createElement('span');
+            icon.className = 'voice-wave-icon';
+            icon.innerHTML = `
+        <svg class="voice-svg flip-left" viewBox="0 0 24 24" aria-hidden="true">
+            <path class="wave w1" d="M3 12a2 2 0 0 1 0 0"></path>
+            <path class="wave w2" d="M6 9a4 4 0 0 1 0 6"></path>
+            <path class="wave w3" d="M9 6a7 7 0 0 1 0 12"></path>
+        </svg>
+    `;
+
+            const audio = document.createElement('audio');
+            audio.preload = 'auto';
+
+            if (
+                msg.content &&
+                typeof msg.content.audio === 'string' &&
+                msg.content.audio.startsWith('data:audio')
+            ) {
+                audio.src = msg.content.audio;
+            } else {
+                voiceContent.classList.add('voice-invalid');
+            }
+
+            voiceContent.appendChild(duration);
+            voiceContent.appendChild(icon);
+            voiceContent.appendChild(audio);
+
+            voiceContent.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                if (!audio.src) return;
+
+                try {
+                    if (audio.paused) {
+                        await audio.play();
+                        voiceContent.classList.add('playing');
+                    } else {
+                        audio.pause();
+                        voiceContent.classList.remove('playing');
+                    }
+                } catch (err) {
+                    console.warn('播放失败:', err);
+                    alert('播放失败：' + err.message);
+                    voiceContent.classList.remove('playing');
+                }
+            });
+
+            audio.addEventListener('ended', () => {
+                voiceContent.classList.remove('playing');
+            });
+
+            audio.addEventListener('pause', () => {
+                voiceContent.classList.remove('playing');
+            });
+
+            container.appendChild(voiceContent);
+        }
         //输入栏变化高度
         const textarea = document.querySelector('.message-input');
         const wrapper = document.querySelector('.input-wrapper');

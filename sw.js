@@ -1,7 +1,7 @@
 // ===== Service Worker 离线缓存 =====
 
 // 🔢 缓存版本号（以后你只改这里）
-const CACHE_VERSION = 'v1.1.1';
+const CACHE_VERSION = 'v1.1.2';
 
 // 🧺 缓存名
 const CACHE_NAME = `chat-app-cache-${CACHE_VERSION}`;
