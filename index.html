@@ -2561,6 +2561,310 @@
             display: block;
         }
 
+
+
+        /* ==========================
+           【本次修改：模拟语音通话 V2 页面 CSS 开始】
+           仅修改上一版新增的通话模块，不改原聊天页面样式
+           ========================== */
+        .sim-call-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 12000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: max(18px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+            background: rgba(34, 34, 36, .20);
+            backdrop-filter: blur(7px);
+            -webkit-backdrop-filter: blur(7px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .24s ease, visibility .24s ease;
+            overflow: hidden;
+        }
+
+        .sim-call-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .sim-call-background {
+            position: absolute;
+            inset: 0;
+            background-position: center;
+            background-size: cover;
+            filter: blur(22px);
+            opacity: .18;
+            transform: scale(1.10);
+        }
+
+        .sim-call-background::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(247, 247, 248, .78);
+        }
+
+        .sim-call-panel {
+            position: relative;
+            z-index: 1;
+            /* 【本次修改：缩小通话卡片宽度，增加与页面左右两侧的留白】 */
+            width: min(84vw, 350px);
+            height: min(82vh, 680px);
+            min-height: 500px;
+            padding: 30px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            border-radius: 30px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, .86);
+            border: 1px solid rgba(255, 255, 255, .74);
+            box-shadow: 0 22px 65px rgba(0, 0, 0, .14);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+        }
+
+        .sim-call-state {
+            font-size: 10px;
+            color: rgba(35, 35, 38, .45);
+            letter-spacing: .8px;
+            margin-bottom: 14px;
+        }
+
+        /* 【本次修改：拨号阶段 Calling 保持在顶部，中部只显示连接/心跳动效】 */
+        .sim-call-overlay.dialing .sim-call-state {
+            visibility: visible;
+        }
+
+        .sim-call-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #d8d8da;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            box-shadow: 0 7px 24px rgba(0, 0, 0, .08), 0 0 0 3px rgba(255,255,255,.76);
+            transition: transform .35s ease, opacity .35s ease;
+        }
+
+        .sim-call-overlay.dialing .sim-call-avatar {
+            animation: simCallDialPulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes simCallDialPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.035); }
+        }
+
+        .sim-call-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sim-call-name {
+            margin-top: 13px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #29292b;
+        }
+
+        .sim-call-duration {
+            margin-top: 6px;
+            min-height: 15px;
+            font-size: 11px;
+            color: rgba(35, 35, 38, .46);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 【本次修改：波形固定放在通话时间下方】 */
+        .sim-call-main-wave {
+            width: 92px;
+            height: 28px;
+            margin-top: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            opacity: 0;
+            transform: translateY(-3px);
+            transition: opacity .28s ease, transform .28s ease;
+        }
+
+        .sim-call-overlay.connected .sim-call-main-wave {
+            opacity: .74;
+            transform: translateY(0);
+        }
+
+        .sim-call-main-wave i {
+            display: block;
+            width: 2px;
+            height: 8px;
+            border-radius: 999px;
+            background: rgba(68, 68, 72, .34);
+            transform-origin: center;
+            animation: simCallWave 1.05s ease-in-out infinite;
+        }
+        .sim-call-main-wave i:nth-child(1) { height: 5px; animation-delay: 0s; }
+        .sim-call-main-wave i:nth-child(2) { height: 10px; animation-delay: .08s; }
+        .sim-call-main-wave i:nth-child(3) { height: 16px; animation-delay: .16s; }
+        .sim-call-main-wave i:nth-child(4) { height: 9px; animation-delay: .24s; }
+        .sim-call-main-wave i:nth-child(5) { height: 20px; animation-delay: .32s; }
+        .sim-call-main-wave i:nth-child(6) { height: 12px; animation-delay: .40s; }
+        .sim-call-main-wave i:nth-child(7) { height: 7px; animation-delay: .48s; }
+        .sim-call-main-wave i:nth-child(8) { height: 15px; animation-delay: .56s; }
+        .sim-call-main-wave i:nth-child(9) { height: 9px; animation-delay: .64s; }
+
+        .sim-call-overlay.speaking .sim-call-main-wave i {
+            animation-duration: .62s;
+            background: rgba(55, 55, 59, .48);
+        }
+
+        @keyframes simCallWave {
+            0%, 100% { transform: scaleY(.48); opacity: .42; }
+            50% { transform: scaleY(1.16); opacity: .92; }
+        }
+
+
+        /* 【本次修改：拨号阶段改为中部 Calling 连接动效】 */
+        .sim-call-dialing-mark {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 96px;
+            height: 96px;
+            width: 112px;
+            height: 112px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .28s ease;
+        }
+
+        .sim-call-overlay.dialing .sim-call-dialing-mark {
+            opacity: 1;
+            animation: simCallDialHeartbeat 1.45s ease-in-out infinite;
+        }
+
+        .sim-call-dialing-ring {
+            position: absolute;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            border: 1px solid rgba(70, 70, 75, .14);
+            animation: simCallDialRipple 2.15s ease-out infinite;
+        }
+
+        .sim-call-dialing-ring:nth-child(2) {
+            animation-delay: .72s;
+        }
+
+        .sim-call-dialing-ring:nth-child(3) {
+            animation-delay: 1.44s;
+        }
+
+        @keyframes simCallDialRipple {
+            0% { transform: scale(.62); opacity: 0; }
+            18% { opacity: .75; }
+            100% { transform: scale(1.85); opacity: 0; }
+        }
+
+        @keyframes simCallDialHeartbeat {
+            0%, 100% { transform: scale(1); opacity: .55; }
+            45% { transform: scale(1.04); opacity: .82; }
+            55% { transform: scale(.99); opacity: .65; }
+            68% { transform: scale(1.03); opacity: .80; }
+        }
+
+        .sim-call-message-stage {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            /* 【本次修改：字幕从波形下方开始，按从上到下的视觉方向出现】 */
+            align-items: flex-start;
+            justify-content: center;
+            padding: 30px 0 12px;
+        }
+
+        /* 【本次修改：去掉上下分隔线，改为纯文字记录式字幕】 */
+        .sim-call-message-wrap {
+            width: min(82%, 270px);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(-7px);
+            filter: blur(2px);
+            transition: opacity .42s ease, transform .42s ease, filter .42s ease;
+        }
+
+        .sim-call-message-wrap.visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        .sim-call-message-wrap.leaving {
+            opacity: 0;
+            transform: translateY(10px);
+            filter: blur(1.5px);
+        }
+
+        .sim-call-message {
+            width: 100%;
+            padding: 4px 2px;
+            color: rgba(48, 48, 52, .72);
+            font-size: 13px;
+            line-height: 1.7;
+            text-align: center;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* 【本次修改：挂断按钮整体在现有基础上轻微上抬，内部电话图标继续保持上移校正】 */
+        .sim-call-end-btn {
+            width: 55px;
+            height: 55px;
+            border: none;
+            border-radius: 50%;
+            background: #ef5350;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transform: translateY(-4px);
+            box-shadow: 0 4px 18px rgba(239,83,80,.22);
+            cursor: pointer;
+        }
+
+        .sim-call-end-btn:active { transform: translateY(-4px) scale(.94); }
+        .sim-call-end-btn svg {
+            width: 25px;
+            height: 25px;
+            transform: translateY(-3px);
+        }
+
+        /* 【本次修改：不再显示“挂断”文字，只保留通用红色电话按钮】 */
+        .sim-call-end-label { display: none; }
+        /* 【本次修改：模拟语音通话 V2 页面 CSS 结束】 */
+
         html,
         body {
             height: 100%;
@@ -2571,6 +2875,205 @@
             overscroll-behavior: none;
             touch-action: none;
         }
+    
+        /* 【本次修改：拨号阶段所有视觉元素严格以卡片中心为基准】 */
+        .sim-call-overlay.dialing .sim-call-card,
+        .sim-call-overlay.dialing .sim-call-main,
+        .sim-call-overlay.dialing .sim-call-content {
+            text-align: center;
+        }
+
+        .sim-call-overlay.dialing .sim-call-dialing-mark {
+            left: 50% !important;
+            top: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            transform: translate(-50%, -50%) !important;
+        }
+
+    
+        /* =====================================================
+           【本次修改：拨号中央“电话连接脉冲”动效开始】
+           仅覆盖拨号动画，不影响接通后的计时、波形和字卡。
+           ===================================================== */
+        .sim-call-dialing-mark {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 112px !important;
+            height: 112px !important;
+            margin: 0 !important;
+            transform: translate(-50%, -50%) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+    
+        /* 【本次修改：拨号中央“电话连接脉冲”动效结束】 */
+
+    
+
+        /* =====================================================
+           【本次修改：通话字幕纵向记录式展示开始】
+           每轮预留最多5个纵向位置；上一条淡出完成后，下一条在下一个位置出现。
+           仅修改通话字幕展示，不修改原主动发送逻辑。
+           ===================================================== */
+        .sim-call-message-stage {
+            align-items: flex-start;
+            justify-content: center;
+            padding: 26px 0 10px;
+        }
+
+        .sim-call-message-wrap {
+            width: min(84%, 280px);
+            min-height: 190px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            gap: 8px;
+            opacity: 1;
+            transform: none;
+            filter: none;
+        }
+
+        .sim-call-message-wrap.visible,
+        .sim-call-message-wrap.leaving {
+            opacity: 1;
+            transform: none;
+            filter: none;
+        }
+
+        .sim-call-record-slot {
+            min-height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sim-call-record-item {
+            width: 100%;
+            padding: 3px 2px;
+            color: rgba(48, 48, 52, .72);
+            font-size: 13px;
+            line-height: 1.55;
+            text-align: center;
+            white-space: pre-wrap;
+            word-break: break-word;
+            opacity: 0;
+            transform: translateY(-6px);
+            filter: blur(1.5px);
+            transition: opacity .42s ease, transform .42s ease, filter .42s ease;
+        }
+
+        .sim-call-record-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+            filter: blur(0);
+        }
+
+        .sim-call-record-item.leaving {
+            opacity: 0;
+            transform: translateY(8px);
+            filter: blur(1px);
+        }
+        /* 【本次修改：通话字幕纵向记录式展示结束】 */
+
+    
+        /* =====================================================
+           【本次修改：拨号中央稳定波形动效开始】
+           只影响拨号阶段；接通后的通话波形保持不变。
+           ===================================================== */
+        .sim-call-dialing-mark {
+            position: absolute !important;
+            left: 50% !important;
+            top: 50% !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 94px !important;
+            height: 54px !important;
+            margin: 0 !important;
+            transform: translate(-50%, -50%) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sim-call-overlay.dialing .sim-call-dialing-mark {
+            opacity: 1;
+            animation: none !important;
+        }
+
+        .sim-call-dial-bar {
+            width: 4px;
+            height: 13px;
+            border-radius: 999px;
+            background: rgba(70, 70, 74, .34);
+            transform-origin: center;
+            animation: simCallDialStableWave 1.15s ease-in-out infinite;
+        }
+
+        .sim-call-dial-bar:nth-child(2) { animation-delay: .08s; }
+        .sim-call-dial-bar:nth-child(3) { animation-delay: .16s; }
+        .sim-call-dial-bar:nth-child(4) { animation-delay: .24s; }
+        .sim-call-dial-bar:nth-child(5) { animation-delay: .32s; }
+        .sim-call-dial-bar:nth-child(6) { animation-delay: .40s; }
+        .sim-call-dial-bar:nth-child(7) { animation-delay: .48s; }
+
+        @keyframes simCallDialStableWave {
+            0%, 100% {
+                transform: scaleY(.62);
+                opacity: .32;
+            }
+            50% {
+                transform: scaleY(2.05);
+                opacity: .78;
+            }
+        }
+        /* 【本次修改：拨号中央稳定波形动效结束】 */
+
+    
+        /* =====================================================
+           【本次修改：双字幕中央布局开始】
+           字幕字号保持不变，只调整显示区域和位置。
+           ===================================================== */
+        .sim-call-message-stage {
+            display: flex;
+            align-items: center !important;
+            justify-content: center;
+            padding: 0 !important;
+            transform: translateY(-46px); /* 【本次修改：双字幕区域继续上移，接近原五条模式第一条位置】 */
+        }
+
+        .sim-call-message-wrap {
+            width: min(82%, 270px);
+            min-height: 82px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-align: center;
+        }
+
+        .sim-call-record-slot {
+            width: 100%;
+            min-height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        /* 【本次修改：双字幕中央布局结束】 */
+
     </style>
 </head>
 
@@ -3144,6 +3647,50 @@
             消息内容已复制到剪贴板！
         </div>
 
+
+
+        <!-- ==========================
+             【本次修改：模拟语音通话 V2 页面 开始】
+             拨号阶段 → 接通后的计时、波形与字幕字卡
+             ========================== -->
+        <div class="sim-call-overlay" id="simCallOverlay" aria-hidden="true">
+            <div class="sim-call-background" id="simCallBackground"></div>
+            <div class="sim-call-panel">
+                <div class="sim-call-state" id="simCallState">语音通话中</div>
+                <div class="sim-call-avatar" id="simCallAvatar"></div>
+                <div class="sim-call-name" id="simCallName">聊天伙伴</div>
+                <div class="sim-call-duration" id="simCallDuration"></div>
+
+                <div class="sim-call-main-wave" id="simCallMainWave" aria-hidden="true">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+
+                <!-- 【本次修改：拨号中央改回稳定波形动效】 -->
+                <div class="sim-call-dialing-mark" aria-hidden="true">
+                    <span class="sim-call-dial-bar"></span>
+                    <span class="sim-call-dial-bar"></span>
+                    <span class="sim-call-dial-bar"></span>
+                    <span class="sim-call-dial-bar"></span>
+                    <span class="sim-call-dial-bar"></span>
+                    <span class="sim-call-dial-bar"></span>
+                    <span class="sim-call-dial-bar"></span>
+                </div>
+
+                <div class="sim-call-message-stage">
+                    <!-- 【本次修改：通话字幕改为每轮最多5个纵向记录位置】 -->
+                    <div class="sim-call-message-wrap" id="simCallMessageWrap"></div>
+                </div>
+
+                <button class="sim-call-end-btn" id="simCallEndBtn" type="button" aria-label="挂断">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M5.2 14.8c4.4-3.5 9.2-3.5 13.6 0" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                        <path d="M7.1 13.8 5.4 17M16.9 13.8l1.7 3.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- 【本次修改：模拟语音通话 V2 页面 结束】 -->
+
         <div class="image-preview hidden" id="imagePreview">
             <img id="imagePreviewImg">
         </div>
@@ -3201,6 +3748,20 @@
         const closeSettings = document.querySelector('.close-settings');
         const stickerBtn = document.querySelector('.tool-sticker-btn');
         const imageBtn = document.querySelector('.tool-image-btn');
+
+        // 【本次修改：模拟语音通话 V2 DOM 引用 开始】
+        const callBtn = document.querySelector('.tool-call-btn');
+        const simCallOverlay = document.getElementById('simCallOverlay');
+        const simCallBackground = document.getElementById('simCallBackground');
+        const simCallAvatar = document.getElementById('simCallAvatar');
+        const simCallName = document.getElementById('simCallName');
+        const simCallState = document.getElementById('simCallState');
+        const simCallDuration = document.getElementById('simCallDuration');
+        const simCallMainWave = document.getElementById('simCallMainWave');
+        const simCallMessageWrap = document.getElementById('simCallMessageWrap');
+        const simCallMessage = document.getElementById('simCallMessage'); // 【本次修改：兼容旧结构；纵向记录版不再直接使用】
+        const simCallEndBtn = document.getElementById('simCallEndBtn');
+        // 【本次修改：模拟语音通话 V2 DOM 引用 结束】
         const stickerPicker = document.getElementById('stickerPicker');
         const imageFileInput = document.getElementById('imageFileInput');
         const botNameElement = document.getElementById('botName');
@@ -3309,6 +3870,27 @@
         let replyTaskQueues = {}; // 各好友的回复任务队列
         let activeSendingTimers = {}; // 各好友的主动发送定时器
         let isProcessingQueues = {}; // 各好友的队列处理状态
+
+        // ==========================
+        // 【本次修改：模拟语音通话 V2 临时状态 开始】
+        // 不写入 IndexedDB，刷新页面后自动结束通话
+        // ==========================
+        let simCallActive = false;
+        let simCallConnected = false;
+        let simCallFriendId = null;
+        let simCallConnectTimer = null;
+        let simCallPhraseTimer = null;
+        // 【本次修改：保存同一轮 1-5 条字卡的延迟任务，挂断时统一清除】
+        let simCallBatchTimers = [];
+        let simCallBubbleTimer = null;
+        let simCallClockTimer = null;
+        let simCallDialClockTimer = null; // 【本次修改：拨号等待秒数计时器】
+        let simCallDialStartedAt = 0; // 【本次修改：记录拨号开始时间】
+        let simCallStartedAt = 0;
+
+        // 【本次修改：用于作废通话前遗留的普通聊天异步任务】
+        let replyQueueGeneration = {};
+        // 【本次修改：模拟语音通话 V2 临时状态 结束】
 
         // 初始化IndexedDB
         function initIndexedDB() {
@@ -3485,6 +4067,8 @@
                 replyTaskQueues[friendId] = [];
                 activeSendingTimers[friendId] = null;
                 isProcessingQueues[friendId] = false;
+                // 【本次修改：初始化普通聊天任务代次，用于通话时作废旧任务】
+                replyQueueGeneration[friendId] = replyQueueGeneration[friendId] || 0;
 
                 // 确保好友对象有unreadCount属性
                 if (!appData.friends[friendId].hasOwnProperty('unreadCount')) {
@@ -3575,6 +4159,8 @@
                         lastMessageText = lastMessage.content;
                     } else if (lastMessage.type === 'sticker') {
                         lastMessageText = '[表情包]';
+                    } else if (lastMessage.type === 'voice') {
+                        lastMessageText = '（语音消息）'; // 【本次修改：好友列表/未读摘要显示语音消息】
                     }
 
                     // 截断过长的消息
@@ -3682,6 +4268,8 @@
             replyTaskQueues[friendId] = [];
             activeSendingTimers[friendId] = null;
             isProcessingQueues[friendId] = false;
+            // 【本次修改：为新好友初始化普通聊天任务代次】
+            replyQueueGeneration[friendId] = 0;
 
             saveData();
             renderFriendsList();
@@ -3907,6 +4495,8 @@
                     img.src = msg.quote;
                     img.className = 'quoted-image';
                     quoteText.appendChild(img);
+                } else if (msg.quoteType === 'voice') {
+                    quoteText.textContent = '（语音消息）'; // 【本次修改：引用语音消息时显示占位文字】
                 } else {
                     quoteText.textContent =
                         msg.quote.length > 50
@@ -4358,6 +4948,8 @@
 
         // 创建回复任务（使用临时状态）
         function createReplyTask(friendId, userMessage) {
+            // 【新增：通话中暂停普通聊天回复；任务仍保留，挂断后继续】
+            // 此处不丢弃用户消息，只阻止立即启动新的回复流程。
             // 检查队列状态
             const queueLength = replyTaskQueues[friendId] ? replyTaskQueues[friendId].length : 0;
 
@@ -4367,6 +4959,8 @@
                 userMessage: userMessage,
                 createdAt: Date.now(),
                 type: 'reply',
+                // 【本次修改：记录任务所属代次，通话后旧代次任务全部失效】
+                generation: replyQueueGeneration[friendId] || 0,
                 // 如果是空队列，这是第一个任务
                 isFirstInQueue: queueLength === 0
             };
@@ -4383,7 +4977,7 @@
             }
 
             // 如果当前没有在处理队列，开始处理
-            if (!isProcessingQueues[friendId]) {
+            if (!isProcessingQueues[friendId] && !(simCallActive && simCallFriendId === friendId)) {
                 processReplyTaskQueue(friendId);
             }
         }
@@ -4459,6 +5053,12 @@
             const friend = appData.friends[friendId];
             if (!friend) return;
 
+            // 【新增：当前好友通话期间暂停普通回复队列】
+            if (simCallActive && simCallFriendId === friendId) {
+                isProcessingQueues[friendId] = false;
+                return;
+            }
+
             // 如果没有任务，结束处理
             if (!replyTaskQueues[friendId] || replyTaskQueues[friendId].length === 0) {
                 isProcessingQueues[friendId] = false;
@@ -4475,6 +5075,8 @@
 
             // 获取当前任务
             const currentTask = replyTaskQueues[friendId][0];
+            // 【本次修改：保存当前任务代次，避免挂断后旧定时器继续输出】
+            const taskGeneration = currentTask.generation ?? (replyQueueGeneration[friendId] || 0);
 
             // 计算延迟：如果是队列中的第一个任务，延迟30秒-1分钟；否则延迟10-20秒
             const delay = currentTask.isFirstInQueue ?
@@ -4485,6 +5087,13 @@
 
             // 设置延迟后执行任务
             const timer = setTimeout(() => {
+                // 【本次修改：进入通话或任务代次已更新时，直接废弃旧任务】
+                if ((simCallActive && simCallFriendId === friendId) ||
+                    taskGeneration !== (replyQueueGeneration[friendId] || 0) ||
+                    !replyTaskQueues[friendId] || replyTaskQueues[friendId][0] !== currentTask) {
+                    isProcessingQueues[friendId] = false;
+                    return;
+                }
                 // 延迟结束后，生成回复消息
                 const replies = generateReplies(friend, currentTask.userMessage);
                 if (replies.length === 0) {
@@ -4495,7 +5104,7 @@
                 }
 
                 // 执行任务，发送消息
-                executeTaskWithReplies(friendId, replies, 0);
+                executeTaskWithReplies(friendId, replies, 0, taskGeneration);
             }, delay);
 
             // 保存定时器引用（临时状态）
@@ -4503,7 +5112,13 @@
         }
 
         // 执行任务（串行发送消息）
-        function executeTaskWithReplies(friendId, replies, messageIndex) {
+        function executeTaskWithReplies(friendId, replies, messageIndex, taskGeneration) {
+            // 【本次修改：通话中或旧任务代次失效时，不再向普通聊天窗口输出】
+            if ((simCallActive && simCallFriendId === friendId) ||
+                taskGeneration !== (replyQueueGeneration[friendId] || 0)) {
+                isProcessingQueues[friendId] = false;
+                return;
+            }
             const friend = appData.friends[friendId];
             if (!friend || !replies || messageIndex >= replies.length) {
                 // 任务完成，从队列中移除
@@ -4541,7 +5156,7 @@
             if (messageIndex < replies.length - 1) {
                 const nextDelay = Math.floor(Math.random() * 2000) + 3000; // 3-5秒
                 setTimeout(() => {
-                    executeTaskWithReplies(friendId, replies, messageIndex + 1);
+                    executeTaskWithReplies(friendId, replies, messageIndex + 1, taskGeneration);
                 }, nextDelay);
             } else {
                 // 这是最后一条消息，任务完成
@@ -4577,7 +5192,11 @@
         function renderVoiceContent(container, msg) {
             const voiceContent = document.createElement('div');
             voiceContent.className = 'voice-content';
-            voiceContent.style.width = '85px';
+
+            // 【本次修改：语音条根据录音秒数改变长度，仅修改宽度，不改播放与录音逻辑】
+            const voiceSeconds = Math.max(0, Number(msg.content && msg.content.duration) || 0);
+            const voiceWidth = Math.min(190, 82 + voiceSeconds * 1.8);
+            voiceContent.style.width = voiceWidth + 'px';
 
             const duration = document.createElement('span');
             duration.className = 'voice-duration';
@@ -4803,6 +5422,9 @@
             const friend = appData.friends[friendId];
             if (!friend || !friend.settings.activeSending) return;
 
+            // 【新增：通话期间不安排当前好友的普通主动发送】
+            if (simCallActive && simCallFriendId === friendId) return;
+
             // 清除旧的定时器
             if (activeSendingTimers[friendId]) {
                 clearTimeout(activeSendingTimers[friendId]);
@@ -4815,6 +5437,8 @@
 
             // 设置新的定时器
             activeSendingTimers[friendId] = setTimeout(() => {
+                // 【新增：如果定时器触发时正在通话，先暂停，挂断后重新安排】
+                if (simCallActive && simCallFriendId === friendId) return;
                 createActiveTask(friendId);
             }, nextDelayMs);
         }
@@ -4823,6 +5447,8 @@
         function createActiveTask(friendId) {
             const friend = appData.friends[friendId];
             if (!friend || !friend.settings.activeSending) return;
+            // 【新增：通话期间暂停当前好友的普通主动发送】
+            if (simCallActive && simCallFriendId === friendId) return;
 
             console.log(`为 ${friend.name} 创建主动发送任务`);
 
@@ -4834,6 +5460,8 @@
                 id: Date.now(),
                 createdAt: Date.now(),
                 type: 'active',
+                // 【本次修改：记录任务所属代次，通话后旧代次任务全部失效】
+                generation: replyQueueGeneration[friendId] || 0,
                 // 如果是空队列，这是第一个任务
                 isFirstInQueue: queueLength === 0
             };
@@ -5457,6 +6085,292 @@
                 }
             }
         });
+
+
+
+        // =========================================================
+        // 【本次修改：模拟语音通话 V2 核心逻辑 开始】
+        // 1. 点击 Call 后先进入“正在拨号中”
+        // 2. 【本次修改】接通等待时间改为随机 0 秒-1 分钟
+        // 3. 【本次修改】接通后按指定陪伴站模式：每轮随机等待 30 秒-1 分钟
+        // 4. 【本次修改】每轮随机连续显示 1-5 条字卡，同轮每条间隔 6500ms
+        // 5. 字卡共用当前好友 settings.phrases
+        // 6. 开始通话时清空并作废该好友旧普通聊天任务
+        // 7. 挂断后仅重新安排新的主动发送，不恢复旧任务
+        // =========================================================
+        // 【本次修改：真人接听等待时间，随机 0 秒-1 分钟】
+        function simCallConnectDelay() {
+            return Math.floor(Math.random() * 60 * 1000);
+        }
+
+        // 【本次修改：通话模式每一轮之间随机等待 30 秒-1 分钟】
+        function simCallRoundDelay() {
+            return 30 * 1000 + Math.floor(Math.random() * 30 * 1000);
+        }
+
+        function simCallFormatDuration(ms) {
+            const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${seconds}`;
+        }
+
+        function simCallRenderFriend(friend) {
+            simCallName.textContent = friend.name || '聊天伙伴';
+            simCallAvatar.innerHTML = '';
+
+            if (friend.avatarImage) {
+                const img = document.createElement('img');
+                img.src = friend.avatarImage;
+                img.alt = friend.name || '头像';
+                simCallAvatar.appendChild(img);
+            } else {
+                simCallAvatar.textContent = friend.avatar || (friend.name ? friend.name.charAt(0) : '友');
+            }
+
+            if (friend.useCustomBackground && friend.backgroundImage) {
+                simCallBackground.style.backgroundImage = `url("${friend.backgroundImage}")`;
+            } else {
+                simCallBackground.style.backgroundImage = 'none';
+            }
+        }
+
+        function simCallPickPhrase() {
+            const friend = appData.friends[simCallFriendId];
+            const phrases = friend && friend.settings && Array.isArray(friend.settings.phrases)
+                ? friend.settings.phrases.filter(item => typeof item === 'string' && item.trim())
+                : [];
+
+            if (!phrases.length) return null;
+            return phrases[Math.floor(Math.random() * phrases.length)];
+        }
+
+        // 【本次修改：字幕区域固定保留两个中央位置，后续字幕循环复用】
+        function simCallPrepareRecordSlots(count) {
+            simCallMessageWrap.innerHTML = '';
+            simCallMessageWrap.style.display = 'flex';
+            simCallMessageWrap.classList.remove('visible', 'leaving');
+
+            const visibleSlotCount = 2;
+            for (let i = 0; i < visibleSlotCount; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'sim-call-record-slot';
+                slot.dataset.index = String(i);
+                simCallMessageWrap.appendChild(slot);
+            }
+        }
+
+        // 【本次修改：字幕从上到下显示两条；第3、4、5条循环回第1、第2个位置】
+        function simCallShowPhrase(text, slotIndex) {
+            if (!simCallActive || !simCallConnected || !text) return;
+
+            const slots = simCallMessageWrap.querySelectorAll('.sim-call-record-slot');
+            if (!slots.length) return;
+            const slot = slots[slotIndex % slots.length];
+            if (!slot) return;
+
+            const item = document.createElement('div');
+            item.className = 'sim-call-record-item';
+            item.textContent = text;
+            slot.innerHTML = '';
+            slot.appendChild(item);
+            simCallOverlay.classList.add('speaking');
+
+            requestAnimationFrame(() => item.classList.add('visible'));
+
+            // 沿用陪伴站节奏：显示6000ms，再用约500ms淡出；下一条在6500ms时出现。
+            const fadeTimer = setTimeout(() => {
+                if (!simCallActive) return;
+                item.classList.remove('visible');
+                item.classList.add('leaving');
+                simCallOverlay.classList.remove('speaking');
+            }, 6000);
+
+            const clearTimer = setTimeout(() => {
+                if (item.parentNode === slot) slot.innerHTML = '';
+            }, 6500);
+
+            simCallBatchTimers.push(fadeTimer, clearTimer);
+        }
+
+        // 【本次修改：每轮随机1-5条，第一条在轮次触发时立即显示，后续按6500ms顺序显示】
+        function simCallPlayPhraseRound() {
+            if (!simCallActive || !simCallConnected) return 0;
+
+            const messageCount = Math.floor(Math.random() * 5) + 1;
+            simCallBatchTimers.forEach(timer => clearTimeout(timer));
+            simCallBatchTimers = [];
+            simCallPrepareRecordSlots(messageCount);
+
+            // 【本次修改：首条不再套 setTimeout(0)，避免首轮触发后字幕未真正执行】
+            const firstPhrase = simCallPickPhrase();
+            if (firstPhrase) {
+                simCallShowPhrase(firstPhrase, 0);
+            }
+
+            for (let i = 1; i < messageCount; i++) {
+                const timer = setTimeout(() => {
+                    if (!simCallActive || !simCallConnected) return;
+                    const phrase = simCallPickPhrase();
+                    if (phrase) simCallShowPhrase(phrase, i);
+                }, i * 6500);
+
+                simCallBatchTimers.push(timer);
+            }
+
+            // 返回本轮完整播放时长，供下一轮在本轮结束后再重新计时
+            return messageCount * 6500;
+        }
+
+        // 【本次修改：先等待30秒-1分钟；本轮全部结束后，再重新计算下一轮30秒-1分钟】
+        function simCallScheduleNextRound() {
+            if (!simCallActive || !simCallConnected) return;
+
+            clearTimeout(simCallPhraseTimer);
+            simCallPhraseTimer = setTimeout(() => {
+                if (!simCallActive || !simCallConnected) return;
+
+                const roundDuration = simCallPlayPhraseRound();
+
+                // 【本次修改：避免下一轮计时与当前1-5条字幕播放重叠】
+                const nextRoundTimer = setTimeout(() => {
+                    if (!simCallActive || !simCallConnected) return;
+                    simCallScheduleNextRound();
+                }, roundDuration);
+
+                simCallBatchTimers.push(nextRoundTimer);
+            }, simCallRoundDelay());
+        }
+
+        function simCallConnect() {
+            if (!simCallActive) return;
+
+            simCallConnected = true;
+            clearInterval(simCallDialClockTimer); // 【本次修改：接通后停止拨号等待计时】
+            simCallDialClockTimer = null;
+            simCallStartedAt = Date.now();
+            simCallState.textContent = '语音通话中'; // 【本次修改：接通后顶部显示“语音通话中”】
+            simCallDuration.textContent = '00:00';
+            simCallOverlay.classList.remove('dialing');
+            simCallOverlay.classList.add('connected');
+
+            clearInterval(simCallClockTimer);
+            simCallClockTimer = setInterval(() => {
+                simCallDuration.textContent = simCallFormatDuration(Date.now() - simCallStartedAt);
+            }, 1000);
+
+            simCallScheduleNextRound();
+        }
+
+        function startSimulatedCall() {
+            if (simCallActive) return;
+
+            const friend = getCurrentFriend();
+            if (!friend) return;
+
+            const phrases = friend.settings && Array.isArray(friend.settings.phrases)
+                ? friend.settings.phrases.filter(item => typeof item === 'string' && item.trim())
+                : [];
+
+            if (!phrases.length) {
+                alert('当前好友的字卡库为空，请先在设置中添加字卡。');
+                return;
+            }
+
+            simCallActive = true;
+            simCallConnected = false;
+            simCallFriendId = friend.id;
+
+            // 【本次修改：通话开始时废弃旧回复任务，之前等待中的任务全部不再计算】
+            replyQueueGeneration[friend.id] = (replyQueueGeneration[friend.id] || 0) + 1;
+            replyTaskQueues[friend.id] = [];
+            isProcessingQueues[friend.id] = false;
+            stopActiveSending(friend.id);
+
+            simCallRenderFriend(friend);
+            simCallState.textContent = '正在拨号中'; // 【本次修改：拨号阶段顶部显示“正在拨号中”】
+            simCallDialStartedAt = Date.now();
+            simCallDuration.textContent = '00:00'; // 【本次修改：名字下方显示拨号等待秒数】
+            clearInterval(simCallDialClockTimer);
+            simCallDialClockTimer = setInterval(() => {
+                if (!simCallActive || simCallConnected) return;
+                simCallDuration.textContent = simCallFormatDuration(Date.now() - simCallDialStartedAt);
+            }, 1000);
+            // 【本次修改：开始新通话前清除上一次可能残留的同轮字卡任务】
+            simCallBatchTimers.forEach(timer => clearTimeout(timer));
+            simCallBatchTimers = [];
+            simCallMessageWrap.style.display = 'none';
+            simCallMessageWrap.classList.remove('visible', 'leaving');
+            if (simCallMessage) simCallMessage.textContent = '';
+            simCallMessageWrap.innerHTML = ''; // 【本次修改：清空本轮纵向字幕位置】
+
+            simCallOverlay.classList.remove('connected', 'speaking');
+            simCallOverlay.classList.add('active', 'dialing');
+            simCallOverlay.setAttribute('aria-hidden', 'false');
+            chatStatus.textContent = 'Calling';
+
+            const toolPanel = document.getElementById('tool-panel');
+            if (toolPanel) toolPanel.classList.add('hidden');
+
+            // 【本次修改：随机 0 秒-1 分钟后接通】
+            clearTimeout(simCallConnectTimer);
+            simCallConnectTimer = setTimeout(simCallConnect, simCallConnectDelay());
+        }
+
+        function endSimulatedCall() {
+            if (!simCallActive) return;
+
+            const endedFriendId = simCallFriendId;
+            simCallActive = false;
+            simCallConnected = false;
+            simCallFriendId = null;
+
+            clearTimeout(simCallConnectTimer);
+            clearTimeout(simCallPhraseTimer);
+            // 【本次修改：挂断时清除本轮尚未出现的字卡】
+            simCallBatchTimers.forEach(timer => clearTimeout(timer));
+            simCallBatchTimers = [];
+            clearTimeout(simCallBubbleTimer);
+            clearInterval(simCallClockTimer);
+            clearInterval(simCallDialClockTimer); // 【本次修改：挂断时清理拨号等待计时】
+            simCallDialClockTimer = null;
+            simCallConnectTimer = null;
+            simCallPhraseTimer = null;
+            simCallBubbleTimer = null;
+            simCallClockTimer = null;
+
+            simCallMessageWrap.classList.remove('visible', 'leaving');
+            simCallMessageWrap.innerHTML = ''; // 【本次修改：挂断时清空所有纵向字幕】
+            simCallMessageWrap.style.display = 'none';
+            simCallOverlay.classList.remove('active', 'dialing', 'connected', 'speaking');
+            simCallOverlay.setAttribute('aria-hidden', 'true');
+
+            // 【本次修改：旧普通回复任务不恢复；保持空队列，从挂断后重新开始】
+            if (endedFriendId) {
+                replyTaskQueues[endedFriendId] = [];
+                isProcessingQueues[endedFriendId] = false;
+            }
+
+            // 【本次修改：主动发送从挂断时重新随机计时】
+            const friend = endedFriendId ? appData.friends[endedFriendId] : null;
+            if (friend && friend.settings.activeSending) {
+                scheduleActiveMessage(endedFriendId);
+            }
+
+            updateChatStatusForCurrentFriend();
+        }
+
+        if (callBtn) {
+            callBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                startSimulatedCall();
+            });
+        }
+
+        simCallEndBtn.addEventListener('click', endSimulatedCall);
+        // 【本次修改：模拟语音通话 V2 核心逻辑 结束】
+
 
         // 角色头像上传事件
         uploadAvatarBtn.addEventListener('click', () => {
