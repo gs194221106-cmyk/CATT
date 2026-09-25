@@ -2652,7 +2652,7 @@
             justify-content: center;
             font-size: 24px;
             color: #fff;
-            box-shadow: 0 7px 24px rgba(0, 0, 0, .08), 0 0 0 3px rgba(255, 255, 255, .76);
+            box-shadow: 0 7px 24px rgba(0, 0, 0, .08), 0 0 0 3px rgba(255,255,255,.76);
             transition: transform .35s ease, opacity .35s ease;
         }
 
@@ -2661,15 +2661,8 @@
         }
 
         @keyframes simCallDialPulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.035);
-            }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.035); }
         }
 
         .sim-call-avatar img {
@@ -2721,51 +2714,15 @@
             transform-origin: center;
             animation: simCallWave 1.05s ease-in-out infinite;
         }
-
-        .sim-call-main-wave i:nth-child(1) {
-            height: 5px;
-            animation-delay: 0s;
-        }
-
-        .sim-call-main-wave i:nth-child(2) {
-            height: 10px;
-            animation-delay: .08s;
-        }
-
-        .sim-call-main-wave i:nth-child(3) {
-            height: 16px;
-            animation-delay: .16s;
-        }
-
-        .sim-call-main-wave i:nth-child(4) {
-            height: 9px;
-            animation-delay: .24s;
-        }
-
-        .sim-call-main-wave i:nth-child(5) {
-            height: 20px;
-            animation-delay: .32s;
-        }
-
-        .sim-call-main-wave i:nth-child(6) {
-            height: 12px;
-            animation-delay: .40s;
-        }
-
-        .sim-call-main-wave i:nth-child(7) {
-            height: 7px;
-            animation-delay: .48s;
-        }
-
-        .sim-call-main-wave i:nth-child(8) {
-            height: 15px;
-            animation-delay: .56s;
-        }
-
-        .sim-call-main-wave i:nth-child(9) {
-            height: 9px;
-            animation-delay: .64s;
-        }
+        .sim-call-main-wave i:nth-child(1) { height: 5px; animation-delay: 0s; }
+        .sim-call-main-wave i:nth-child(2) { height: 10px; animation-delay: .08s; }
+        .sim-call-main-wave i:nth-child(3) { height: 16px; animation-delay: .16s; }
+        .sim-call-main-wave i:nth-child(4) { height: 9px; animation-delay: .24s; }
+        .sim-call-main-wave i:nth-child(5) { height: 20px; animation-delay: .32s; }
+        .sim-call-main-wave i:nth-child(6) { height: 12px; animation-delay: .40s; }
+        .sim-call-main-wave i:nth-child(7) { height: 7px; animation-delay: .48s; }
+        .sim-call-main-wave i:nth-child(8) { height: 15px; animation-delay: .56s; }
+        .sim-call-main-wave i:nth-child(9) { height: 9px; animation-delay: .64s; }
 
         .sim-call-overlay.speaking .sim-call-main-wave i {
             animation-duration: .62s;
@@ -2773,17 +2730,8 @@
         }
 
         @keyframes simCallWave {
-
-            0%,
-            100% {
-                transform: scaleY(.48);
-                opacity: .42;
-            }
-
-            50% {
-                transform: scaleY(1.16);
-                opacity: .92;
-            }
+            0%, 100% { transform: scaleY(.48); opacity: .42; }
+            50% { transform: scaleY(1.16); opacity: .92; }
         }
 
 
@@ -2832,43 +2780,16 @@
         }
 
         @keyframes simCallDialRipple {
-            0% {
-                transform: scale(.62);
-                opacity: 0;
-            }
-
-            18% {
-                opacity: .75;
-            }
-
-            100% {
-                transform: scale(1.85);
-                opacity: 0;
-            }
+            0% { transform: scale(.62); opacity: 0; }
+            18% { opacity: .75; }
+            100% { transform: scale(1.85); opacity: 0; }
         }
 
         @keyframes simCallDialHeartbeat {
-
-            0%,
-            100% {
-                transform: scale(1);
-                opacity: .55;
-            }
-
-            45% {
-                transform: scale(1.04);
-                opacity: .82;
-            }
-
-            55% {
-                transform: scale(.99);
-                opacity: .65;
-            }
-
-            68% {
-                transform: scale(1.03);
-                opacity: .80;
-            }
+            0%, 100% { transform: scale(1); opacity: .55; }
+            45% { transform: scale(1.04); opacity: .82; }
+            55% { transform: scale(.99); opacity: .65; }
+            68% { transform: scale(1.03); opacity: .80; }
         }
 
         .sim-call-message-stage {
@@ -2929,14 +2850,11 @@
             justify-content: center;
             padding: 0;
             transform: translateY(-4px);
-            box-shadow: 0 4px 18px rgba(239, 83, 80, .22);
+            box-shadow: 0 4px 18px rgba(239,83,80,.22);
             cursor: pointer;
         }
 
-        .sim-call-end-btn:active {
-            transform: translateY(-4px) scale(.94);
-        }
-
+        .sim-call-end-btn:active { transform: translateY(-4px) scale(.94); }
         .sim-call-end-btn svg {
             width: 25px;
             height: 25px;
@@ -2944,10 +2862,7 @@
         }
 
         /* 【本次修改：不再显示“挂断”文字，只保留通用红色电话按钮】 */
-        .sim-call-end-label {
-            display: none;
-        }
-
+        .sim-call-end-label { display: none; }
         /* 【本次修改：模拟语音通话 V2 页面 CSS 结束】 */
 
         html,
@@ -2960,7 +2875,7 @@
             overscroll-behavior: none;
             touch-action: none;
         }
-
+    
         /* 【本次修改：拨号阶段所有视觉元素严格以卡片中心为基准】 */
         .sim-call-overlay.dialing .sim-call-card,
         .sim-call-overlay.dialing .sim-call-main,
@@ -2976,7 +2891,7 @@
             transform: translate(-50%, -50%) !important;
         }
 
-
+    
         /* =====================================================
            【本次修改：拨号中央“电话连接脉冲”动效开始】
            仅覆盖拨号动画，不影响接通后的计时、波形和字卡。
@@ -2998,10 +2913,10 @@
             pointer-events: none;
         }
 
-
+    
         /* 【本次修改：拨号中央“电话连接脉冲”动效结束】 */
 
-
+    
 
         /* =====================================================
            【本次修改：通话字幕纵向记录式展示开始】
@@ -3067,10 +2982,9 @@
             transform: translateY(8px);
             filter: blur(1px);
         }
-
         /* 【本次修改：通话字幕纵向记录式展示结束】 */
 
-
+    
         /* =====================================================
            【本次修改：拨号中央稳定波形动效开始】
            只影响拨号阶段；接通后的通话波形保持不变。
@@ -3107,47 +3021,26 @@
             animation: simCallDialStableWave 1.15s ease-in-out infinite;
         }
 
-        .sim-call-dial-bar:nth-child(2) {
-            animation-delay: .08s;
-        }
-
-        .sim-call-dial-bar:nth-child(3) {
-            animation-delay: .16s;
-        }
-
-        .sim-call-dial-bar:nth-child(4) {
-            animation-delay: .24s;
-        }
-
-        .sim-call-dial-bar:nth-child(5) {
-            animation-delay: .32s;
-        }
-
-        .sim-call-dial-bar:nth-child(6) {
-            animation-delay: .40s;
-        }
-
-        .sim-call-dial-bar:nth-child(7) {
-            animation-delay: .48s;
-        }
+        .sim-call-dial-bar:nth-child(2) { animation-delay: .08s; }
+        .sim-call-dial-bar:nth-child(3) { animation-delay: .16s; }
+        .sim-call-dial-bar:nth-child(4) { animation-delay: .24s; }
+        .sim-call-dial-bar:nth-child(5) { animation-delay: .32s; }
+        .sim-call-dial-bar:nth-child(6) { animation-delay: .40s; }
+        .sim-call-dial-bar:nth-child(7) { animation-delay: .48s; }
 
         @keyframes simCallDialStableWave {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scaleY(.62);
                 opacity: .32;
             }
-
             50% {
                 transform: scaleY(2.05);
                 opacity: .78;
             }
         }
-
         /* 【本次修改：拨号中央稳定波形动效结束】 */
 
-
+    
         /* =====================================================
            【本次修改：双字幕中央布局开始】
            字幕字号保持不变，只调整显示区域和位置。
@@ -3157,8 +3050,7 @@
             align-items: center !important;
             justify-content: center;
             padding: 0 !important;
-            transform: translateY(-46px);
-            /* 【本次修改：双字幕区域继续上移，接近原五条模式第一条位置】 */
+            transform: translateY(-46px); /* 【本次修改：双字幕区域继续上移，接近原五条模式第一条位置】 */
         }
 
         .sim-call-message-wrap {
@@ -3180,225 +3072,8 @@
             justify-content: center;
             text-align: center;
         }
-
         /* 【本次修改：双字幕中央布局结束】 */
 
-
-        /* 【本次修改：历史消息浏览 / 引用定位 / 长按操作；仅新增，不改原聊天 UI】 */
-        /* 【本次修改：最新消息按钮】增加与边界距离、减轻阴影、缩小箭头；其余逻辑不动 */
-        /* 【本次修改：定位到最新消息按钮】 */
-        .jump-latest-btn {
-            position: absolute;
-            right: 22px;
-            bottom: 22px;
-            z-index: 8;
-
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-
-            border: 1px solid rgba(0, 0, 0, .05);
-            background: rgba(255, 255, 255, .95);
-            box-shadow: 0 2px 7px rgba(0, 0, 0, .055);
-
-            display: none;
-            align-items: center;
-            justify-content: center;
-
-            padding: 0 0 2px 0;
-            /* 箭头视觉上移一点 */
-            color: #555;
-            font-size: 13px;
-            font-weight: 600;
-            /* 箭头稍微加粗 */
-            line-height: 1;
-
-            cursor: pointer;
-        }
-
-        .jump-latest-btn.visible {
-            display: flex;
-        }
-
-        .jump-latest-btn:active {
-            transform: scale(.94);
-        }
-
-        /* 【本次修改：仅调整长按操作栏设计；不改引用/撤回/解析等功能逻辑】 */
-        .message-action-menu {
-            position: absolute;
-            z-index: 15000;
-            display: none;
-            align-items: center;
-            background: rgba(255, 255, 255, .985);
-            border: 1px solid rgba(0, 0, 0, .045);
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .055);
-            overflow: visible;
-            padding: 2px 3px;
-            font-size: 10px;
-            white-space: nowrap;
-        }
-
-        .message-action-menu.active {
-            display: flex
-        }
-
-        .message-action-menu::after {
-            content: "";
-            position: absolute;
-            left: var(--action-arrow-x, 18px);
-            bottom: -3px;
-            width: 6px;
-            height: 6px;
-            background: rgba(255, 255, 255, .985);
-            border-right: 1px solid rgba(0, 0, 0, .035);
-            border-bottom: 1px solid rgba(0, 0, 0, .035);
-            transform: rotate(45deg);
-        }
-
-        .action-menu-item {
-            border: 0;
-            background: transparent;
-            padding: 5px 8px;
-            font-size: 10px;
-            line-height: 1;
-            color: #555;
-            border-radius: 7px;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .action-menu-item+.action-menu-item {
-            border-left: 1px solid rgba(0, 0, 0, .045);
-        }
-
-        .action-menu-item:active {
-            background: rgba(0, 0, 0, .025)
-        }
-
-        .message-locate-flash {
-            animation: messageLocateFlash 1.2s ease
-        }
-
-        @keyframes messageLocateFlash {
-
-            0%,
-            100% {
-                filter: none
-            }
-
-            35% {
-                filter: brightness(.9)
-            }
-        }
-
-        .manual-quote-preview {
-            display: none;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            background: rgba(248, 248, 248, .96);
-            border-top: 1px solid rgba(0, 0, 0, .04);
-            font-size: 10px;
-            color: #666
-        }
-
-        .manual-quote-preview.active {
-            display: flex
-        }
-
-        .manual-quote-preview-text {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap
-        }
-
-        .manual-quote-cancel {
-            border: 0;
-            background: transparent;
-            font-size: 16px;
-            color: #999;
-            padding: 0 2px
-        }
-
-        /* 【本次修改：引用图片/表情包缩略图固定尺寸；全屏预览仍按原图比例】 */
-        .quoted-content .quoted-text img.quoted-image {
-            width: 64px !important;
-            height: 64px !important;
-            max-width: 64px !important;
-            max-height: 64px !important;
-            object-fit: cover !important
-        }
-
-        /* 【本次修改：通话结束 / 撤回记录完全复用时间戳胶囊视觉】 */
-        .call-event-row {
-            text-align: center;
-            margin: 12px 0;
-            font-size: 9px;
-            color: #8e8e93;
-            position: relative;
-        }
-
-        .call-event-row span {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 999px;
-            background-color: #ededed;
-            line-height: 1.4;
-        }
-
-        /* 【本次修改：禁止 iPhone/Safari 长按图片弹出系统保存菜单；不改图片点击预览】 */
-        .chat-area img {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-user-drag: none;
-        }
-
-        /* 【本次修改：主动来电弹窗只新增必要样式，复用现有通话视觉】 */
-        .incoming-call-actions {
-            display: flex;
-            justify-content: center;
-            gap: 58px;
-            margin-top: auto;
-            padding-bottom: 26px
-        }
-
-        .incoming-call-action {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 7px;
-            font-size: 10px;
-            color: #666
-        }
-
-        .incoming-call-action button {
-            width: 52px;
-            height: 52px;
-            border: 0;
-            border-radius: 50%;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, .10)
-        }
-
-        .incoming-call-action svg {
-            width: 24px;
-            height: 24px
-        }
-
-        .incoming-call-decline {
-            background: #ef5350
-        }
-
-        .incoming-call-accept {
-            background: #4caf50;
-            transform: rotate(180deg)
-        }
     </style>
 </head>
 
@@ -3490,14 +3165,8 @@
             <div class="chat-area" id="chatArea">
                 <!-- 聊天消息 -->
             </div>
-            <!-- 【本次修改：查看历史消息时才出现，点击回到最新】 -->
-            <button class="jump-latest-btn" id="jumpLatestBtn" type="button" aria-label="回到最新消息">↓</button>
         </div>
 
-        <!-- 【本次修改：手动引用预览】 -->
-        <div class="manual-quote-preview" id="manualQuotePreview"><span class="manual-quote-preview-text"
-                id="manualQuotePreviewText"></span><button class="manual-quote-cancel" id="manualQuoteCancel"
-                type="button">×</button></div>
         <!-- 底部输入区（系统层，纯白） -->
         <div class="input-card">
 
@@ -3797,15 +3466,6 @@
                     </div>
                 </div>
 
-                <!-- 【本次修改：每位好友独立保存主动来电开关】 -->
-                <div class="setting-section">
-                    <h3>主动来电设置</h3>
-                    <div class="toggle-container"><span class="toggle-label">角色主动发起通话</span><label
-                            class="toggle-switch"><input type="checkbox" id="incomingCallToggle"><span
-                                class="toggle-slider"></span></label></div>
-                    <div class="toggle-description">开启后，此角色会在页面打开期间随机来电</div>
-                </div>
-
                 <!-- 主动发送消息开关 -->
                 <div class="setting-section">
                     <h3>主动发送消息设置</h3>
@@ -4023,41 +3683,14 @@
 
                 <button class="sim-call-end-btn" id="simCallEndBtn" type="button" aria-label="挂断">
                     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M5.2 14.8c4.4-3.5 9.2-3.5 13.6 0" stroke="currentColor" stroke-width="2.2"
-                            stroke-linecap="round" />
-                        <path d="M7.1 13.8 5.4 17M16.9 13.8l1.7 3.2" stroke="currentColor" stroke-width="2.2"
-                            stroke-linecap="round" />
+                        <path d="M5.2 14.8c4.4-3.5 9.2-3.5 13.6 0" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                        <path d="M7.1 13.8 5.4 17M16.9 13.8l1.7 3.2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
                     </svg>
                 </button>
             </div>
         </div>
         <!-- 【本次修改：模拟语音通话 V2 页面 结束】 -->
 
-
-        <!-- 【本次修改：长按消息操作栏】 -->
-        <div class="message-action-menu" id="messageActionMenu"></div>
-        <!-- 【本次修改：角色主动来电；接听后复用现有通话界面】 -->
-        <div class="sim-call-overlay incoming-call-overlay" id="incomingCallOverlay" aria-hidden="true">
-            <div class="sim-call-background" id="incomingCallBackground"></div>
-            <div class="sim-call-panel">
-                <div class="sim-call-state">正在来电</div>
-                <div class="sim-call-avatar" id="incomingCallAvatar"></div>
-                <div class="sim-call-name" id="incomingCallName">聊天伙伴</div>
-                <div class="sim-call-duration" id="incomingCallDuration">00:00</div>
-                <div class="incoming-call-actions">
-                    <div class="incoming-call-action"><button class="incoming-call-decline" id="incomingCallDecline"
-                            type="button"><svg viewBox="0 0 24 24" fill="none">
-                                <path d="M5.2 14.8c4.4-3.5 9.2-3.5 13.6 0M7.1 13.8 5.4 17M16.9 13.8l1.7 3.2"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
-                            </svg></button><span>拒接</span></div>
-                    <div class="incoming-call-action"><button class="incoming-call-accept" id="incomingCallAccept"
-                            type="button"><svg viewBox="0 0 24 24" fill="none">
-                                <path d="M5.2 14.8c4.4-3.5 9.2-3.5 13.6 0M7.1 13.8 5.4 17M16.9 13.8l1.7 3.2"
-                                    stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
-                            </svg></button><span>接听</span></div>
-                </div>
-            </div>
-        </div>
         <div class="image-preview hidden" id="imagePreview">
             <img id="imagePreviewImg">
         </div>
@@ -4097,7 +3730,6 @@
                     settings: {
                         multiMessageEnabled: true,
                         activeSending: false,
-                        incomingCallEnabled: false, // 【本次修改：角色主动来电默认关闭】
                         enableQuoteReply: true,
                         phrases: ["你好！", "今天过得怎么样？", "有什么新鲜事吗？", "很高兴和你聊天！", "最近在忙什么？"],
                         stickers: []
@@ -4108,11 +3740,6 @@
 
         // DOM元素 - 保持不变...
         const chatArea = document.getElementById('chatArea');
-        const jumpLatestBtn = document.getElementById('jumpLatestBtn'); // 【本次修改】
-        const messageActionMenu = document.getElementById('messageActionMenu');
-        const manualQuotePreview = document.getElementById('manualQuotePreview');
-        const manualQuotePreviewText = document.getElementById('manualQuotePreviewText');
-        const manualQuoteCancel = document.getElementById('manualQuoteCancel');
         const messageInput = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const voiceBtn = document.getElementById('voiceBtn'); // 👈 就加在这一堆里
@@ -4134,7 +3761,6 @@
         const simCallMessageWrap = document.getElementById('simCallMessageWrap');
         const simCallMessage = document.getElementById('simCallMessage'); // 【本次修改：兼容旧结构；纵向记录版不再直接使用】
         const simCallEndBtn = document.getElementById('simCallEndBtn');
-        const incomingCallOverlay = document.getElementById('incomingCallOverlay'), incomingCallBackground = document.getElementById('incomingCallBackground'), incomingCallAvatar = document.getElementById('incomingCallAvatar'), incomingCallName = document.getElementById('incomingCallName'), incomingCallDuration = document.getElementById('incomingCallDuration'), incomingCallDecline = document.getElementById('incomingCallDecline'), incomingCallAccept = document.getElementById('incomingCallAccept');
         // 【本次修改：模拟语音通话 V2 DOM 引用 结束】
         const stickerPicker = document.getElementById('stickerPicker');
         const imageFileInput = document.getElementById('imageFileInput');
@@ -4144,7 +3770,6 @@
         const userNameInput = document.getElementById('userNameInput');
         const multiMessageToggle = document.getElementById('multiMessageToggle');
         const activeSendingToggle = document.getElementById('activeSendingToggle');
-        const incomingCallToggle = document.getElementById('incomingCallToggle');
         const quoteReplyToggle = document.getElementById('quoteReplyToggle');
         const clearHistoryBtn = document.getElementById('clearHistoryBtn');
         const exportHistoryBtn = document.getElementById('exportHistoryBtn');
@@ -4265,11 +3890,6 @@
 
         // 【本次修改：用于作废通话前遗留的普通聊天异步任务】
         let replyQueueGeneration = {};
-        // 【本次修改：历史浏览、手动引用、主动来电临时状态】
-        let manualQuoteTarget = null;
-        let isViewingHistory = false;
-        let incomingCallTimers = {};
-        let incomingCallFriendId = null, incomingCallClockTimer = null, incomingCallStartedAt = 0;
         // 【本次修改：模拟语音通话 V2 临时状态 结束】
 
         // 初始化IndexedDB
@@ -4540,7 +4160,7 @@
                     } else if (lastMessage.type === 'sticker') {
                         lastMessageText = '[表情包]';
                     } else if (lastMessage.type === 'voice') {
-                        lastMessageText = '[语音消息]'; // 【本次修改：好友列表/未读摘要显示语音消息】
+                        lastMessageText = '（语音消息）'; // 【本次修改：好友列表/未读摘要显示语音消息】
                     }
 
                     // 截断过长的消息
@@ -4638,7 +4258,6 @@
                 settings: {
                     multiMessageEnabled: true,
                     activeSending: false,
-                    incomingCallEnabled: false,
                     enableQuoteReply: true,
                     phrases: ["你好！", "今天过得怎么样？", "有什么新鲜事吗？", "很高兴和你聊天！", "最近在忙什么？"],
                     stickers: []
@@ -4746,15 +4365,6 @@
                 minute: '2-digit'
             });
 
-            // 【本次修改：通话结束 / 撤回记录本身就是“时间戳位置”的胶囊，不再额外生成普通时间戳】
-            if (msg.type === 'call_event' || msg.type === 'recall_event') {
-                const row = document.createElement('div');
-                row.className = 'call-event-row';
-                row.innerHTML = `<span>${msg.content || (msg.type === 'recall_event' ? '你撤回了一条消息' : '通话结束')}</span>`;
-                fragment.appendChild(row);
-                return fragment;
-            }
-
             // ===== 时间分割线（只在需要时插入）=====
             if (
                 index === 0 ||
@@ -4784,7 +4394,6 @@
             const messageContainer = document.createElement('div');
             messageContainer.className =
                 `message-container ${msg.sender}-container`;
-            messageContainer.dataset.messageIndex = String(index);
 
             /*// ===== 头像合并判断 =====
             let showAvatar = true;
@@ -4852,7 +4461,8 @@
 
             // 4️⃣ 判断是否无气泡
             const isNoBubble =
-                (msg.type === 'image' || msg.type === 'sticker') && !msg.quote;
+                msg.type === 'image' ||
+                msg.type === 'sticker';
 
             // 5️⃣ 设置气泡 class
             messageDiv.className =
@@ -4868,8 +4478,6 @@
 
                 const quotedContent = document.createElement('div');
                 quotedContent.className = 'quoted-content';
-                quotedContent.style.cursor = 'pointer';
-                quotedContent.addEventListener('click', (e) => { if (e.target.closest('img')) return; e.stopPropagation(); locateQuotedMessage(msg); });
 
                 const quoteSender = document.createElement('div');
                 quoteSender.className = 'quote-sender';
@@ -4973,7 +4581,6 @@
 
             // 全量渲染完，直接滚到底
             chatArea.scrollTop = chatArea.scrollHeight;
-            isViewingHistory = false; updateJumpLatestButton();
         }
 
         // 计算时间差（分钟）——保持不变
@@ -5102,7 +4709,6 @@
             userNameInput.value = appData.userName;
             multiMessageToggle.checked = currentFriend.settings.multiMessageEnabled;
             activeSendingToggle.checked = currentFriend.settings.activeSending;
-            incomingCallToggle.checked = !!currentFriend.settings.incomingCallEnabled;
             quoteReplyToggle.checked = currentFriend.settings.enableQuoteReply;
             useCustomBackgroundToggle.checked = currentFriend.useCustomBackground;
 
@@ -5294,12 +4900,6 @@
 
                     await saveData();
                     addMessageToChat(msg);
-                    /* 【本次修改：我主动发送语音后也强制滚到最新一条】 */
-                    isViewingHistory = false;
-                    requestAnimationFrame(() => {
-                        chatArea.scrollTop = chatArea.scrollHeight;
-                        updateJumpLatestButton();
-                    });
 
                     createReplyTask(friend.id, msg);
 
@@ -5330,20 +4930,9 @@
                 content: content,
                 timestamp: Date.now()
             };
-            // 【本次修改：手动引用始终引用目标消息“最新正文”，不套娃旧引用】
-            if (manualQuoteTarget) {
-                userMessage.quote = quoteSummary(manualQuoteTarget.msg); userMessage.quoteType = manualQuoteTarget.msg.type; userMessage.quoteSender = manualQuoteTarget.msg.sender === 'user' ? appData.userName : currentFriend.name; userMessage.quoteTargetTimestamp = manualQuoteTarget.msg.timestamp;
-                clearManualQuote();
-            }
 
             currentFriend.messages.push(userMessage);
             addMessageToChat(userMessage);
-            /* 【本次修改：只有“我主动发送消息”时，强制回到最新一条；角色新消息仍保留历史浏览位置】 */
-            isViewingHistory = false;
-            requestAnimationFrame(() => {
-                chatArea.scrollTop = chatArea.scrollHeight;
-                updateJumpLatestButton();
-            });
 
             // 保存数据（包括用户消息）
             await saveData();
@@ -5451,7 +5040,6 @@
                     botMessage.quote = quoteMessage.content;
                     botMessage.quoteType = quoteMessage.type;
                     botMessage.quoteSender = appData.userName;
-                    botMessage.quoteTargetTimestamp = quoteMessage.timestamp;
                 }
 
                 replies.push(botMessage);
@@ -5557,6 +5145,7 @@
             // 如果当前查看的是这个好友的聊天，则更新聊天界面
             if (appData.currentFriendId === friendId) {
                 addMessageToChat(reply);
+                chatArea.scrollTop = chatArea.scrollHeight;
             } else {
                 // 如果不是当前好友，增加未读计数
                 friend.unreadCount++;
@@ -5593,10 +5182,9 @@
 
             chatArea.appendChild(node);
 
-            // 【本次修改：只有原本就在底部时才自动跟随；查看历史时绝不抢位置】
+            // ✅ 发送消息后自动滚到底部
             requestAnimationFrame(() => {
-                if (!isViewingHistory) chatArea.scrollTop = chatArea.scrollHeight;
-                updateJumpLatestButton();
+                chatArea.scrollTop = chatArea.scrollHeight;
             });
         }
 
@@ -6312,9 +5900,6 @@
             saveData();
         });
 
-        // 【本次修改：主动来电开关】
-        incomingCallToggle.addEventListener('change', () => { const f = getCurrentFriend(); f.settings.incomingCallEnabled = incomingCallToggle.checked; saveData(); if (f.settings.incomingCallEnabled) scheduleIncomingCall(f.id); else clearTimeout(incomingCallTimers[f.id]); });
-
         // 引用消息回复开关事件
         quoteReplyToggle.addEventListener('change', () => {
             const currentFriend = getCurrentFriend();
@@ -6503,100 +6088,12 @@
 
 
 
-
-        // =========================================================
-        // 【本次修改：历史浏览 + 引用定位 + 长按消息操作】
-        // =========================================================
-        function isNearChatBottom() { return chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 44; }
-        function updateJumpLatestButton() { const show = isViewingHistory && !isNearChatBottom(); jumpLatestBtn.classList.toggle('visible', show); }
-        chatArea.addEventListener('scroll', () => { isViewingHistory = !isNearChatBottom(); updateJumpLatestButton(); }, { passive: true });
-        jumpLatestBtn.addEventListener('click', () => { isViewingHistory = false; chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' }); updateJumpLatestButton(); });
-        function quoteSummary(msg) { if (!msg) return ''; if (msg.type === 'voice') return '[语音消息]'; if (msg.type === 'image' || msg.type === 'sticker') return msg.content; return String(msg.content ?? ''); }
-        function clearManualQuote() { manualQuoteTarget = null; manualQuotePreview.classList.remove('active'); }
-        manualQuoteCancel.addEventListener('click', clearManualQuote);
-        function beginManualQuote(index) { const f = getCurrentFriend(), msg = f.messages[index]; if (!msg) return; manualQuoteTarget = { index, msg }; const t = quoteSummary(msg); manualQuotePreviewText.textContent = (msg.sender === 'user' ? appData.userName : f.name) + '：' + ((msg.type === 'image' || msg.type === 'sticker') ? '[图片]' : t.slice(0, 45)); manualQuotePreview.classList.add('active'); messageInput.focus(); }
-        function locateQuotedMessage(msg) { const f = getCurrentFriend(); let idx = -1; if (msg.quoteTargetTimestamp) idx = f.messages.findIndex(m => m.timestamp === msg.quoteTargetTimestamp); if (idx < 0) { for (let i = f.messages.length - 1; i >= 0; i--) { if (i === f.messages.indexOf(msg)) continue; if (quoteSummary(f.messages[i]) === msg.quote) { idx = i; break; } } } if (idx < 0) return; const el = chatArea.querySelector(`.message-container[data-message-index="${idx}"]`); if (!el) return; isViewingHistory = true; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.remove('message-locate-flash'); requestAnimationFrame(() => el.classList.add('message-locate-flash')); setTimeout(() => el.classList.remove('message-locate-flash'), 1300); updateJumpLatestButton(); }
-        function closeMessageActionMenu() {
-            messageActionMenu.classList.remove('active');
-            messageActionMenu.innerHTML = '';
-            /* 【本次修改】关闭后放回 body，下一次长按可重新挂到对应消息 */
-            if (messageActionMenu.parentNode !== document.body) document.body.appendChild(messageActionMenu);
-        }
-        function showMessageActionMenu(index, container) {
-            const f = getCurrentFriend(), msg = f.messages[index];
-            if (!msg || msg.type === 'call_event' || msg.type === 'recall_event') return;
-
-            messageActionMenu.innerHTML = '';
-            const labels = msg.sender === 'user' ? ['引用', '撤回'] : ['引用', '解析'];
-            labels.forEach(label => {
-                const b = document.createElement('button');
-                b.className = 'action-menu-item';
-                b.textContent = label;
-                b.onclick = (e) => {
-                    e.stopPropagation();
-                    closeMessageActionMenu();
-                    if (label === '引用') beginManualQuote(index);
-                    else if (label === '撤回') {
-                        /* 【本次修改：撤回后不显示原消息；在时间戳位置保留“你撤回了一条消息”胶囊记录】 */
-                        const recalledMsg = f.messages[index];
-                        f.messages[index] = {
-                            sender: 'system',
-                            type: 'recall_event',
-                            content: '你撤回了一条消息',
-                            timestamp: recalledMsg.timestamp
-                        };
-                        /* 【本次修改：同步移除尚未处理的该消息回复任务，角色不能继续使用被撤回内容】 */
-                        if (replyTaskQueues[f.id]) {
-                            replyTaskQueues[f.id] = replyTaskQueues[f.id].filter(task => task.userMessage !== recalledMsg);
-                        }
-                        saveData();
-                        renderChat();
-                    }
-                    /* “解析”仅保留原入口，用户尚未定义后续行为，不擅自改业务逻辑 */
-                };
-                messageActionMenu.appendChild(b);
-            });
-
-            /* 【本次修改：长按栏真正依附当前消息，随消息一起滚动；不再固定在屏幕上】 */
-            container.style.position = container.style.position || 'relative';
-            container.appendChild(messageActionMenu);
-            messageActionMenu.classList.add('active');
-            messageActionMenu.style.visibility = 'hidden';
-            messageActionMenu.style.left = 'auto';
-            messageActionMenu.style.right = 'auto';
-            messageActionMenu.style.top = 'auto';
-            messageActionMenu.style.bottom = 'auto';
-
-            const mw = messageActionMenu.offsetWidth;
-            const mh = messageActionMenu.offsetHeight;
-            const gap = -12; // 【本次修改】缩短操作栏与消息气泡之间的间距
-
-            if (msg.sender === 'user') {
-                messageActionMenu.style.right = '6px';
-            } else {
-                messageActionMenu.style.left = '44px';
-            }
-            messageActionMenu.style.top = (-(mh + gap)) + 'px';
-
-            /* 小尖角尽量指向当前消息，不改变菜单功能 */
-            messageActionMenu.style.setProperty('--action-arrow-x', msg.sender === 'user' ? Math.max(12, mw - 20) + 'px' : '18px');
-            messageActionMenu.style.visibility = 'visible';
-        }
-        let messagePressTimer = null, messagePressStart = null;
-        chatArea.addEventListener('pointerdown', e => { const c = e.target.closest('.message-container'); if (!c) return; messagePressStart = { x: e.clientX, y: e.clientY }; clearTimeout(messagePressTimer); messagePressTimer = setTimeout(() => showMessageActionMenu(Number(c.dataset.messageIndex), c), 520) });
-        chatArea.addEventListener('pointermove', e => { if (messagePressStart && Math.hypot(e.clientX - messagePressStart.x, e.clientY - messagePressStart.y) > 10) clearTimeout(messagePressTimer) });
-        ['pointerup', 'pointercancel'].forEach(n => chatArea.addEventListener(n, () => { clearTimeout(messagePressTimer); messagePressStart = null }));
-        /* 【本次修改：只要点在操作栏之外就关闭；聊天区空白和其他消息都可直接取消】 */
-        document.addEventListener('pointerdown', e => { if (!e.target.closest('#messageActionMenu')) closeMessageActionMenu() });
-        /* 【本次修改：阻止图片原生 contextmenu，避免与自定义长按操作栏相撞】 */
-        chatArea.addEventListener('contextmenu', e => { if (e.target.closest('img')) e.preventDefault(); });
-
         // =========================================================
         // 【本次修改：模拟语音通话 V2 核心逻辑 开始】
         // 1. 点击 Call 后先进入“正在拨号中”
         // 2. 【本次修改】接通等待时间改为随机 0 秒-1 分钟
         // 3. 【本次修改】接通后按指定陪伴站模式：每轮随机等待 30 秒-1 分钟
-        // 4. 【本次修改】每轮随机连续显示 1-10 条字卡，同轮每条间隔 6500ms
+        // 4. 【本次修改】每轮随机连续显示 1-5 条字卡，同轮每条间隔 6500ms
         // 5. 字卡共用当前好友 settings.phrases
         // 6. 开始通话时清空并作废该好友旧普通聊天任务
         // 7. 挂断后仅重新安排新的主动发送，不恢复旧任务
@@ -6696,11 +6193,11 @@
             simCallBatchTimers.push(fadeTimer, clearTimer);
         }
 
-        // 【本次修改：每轮随机1-10条，第一条在轮次触发时立即显示，后续按6500ms顺序显示】
+        // 【本次修改：每轮随机1-5条，第一条在轮次触发时立即显示，后续按6500ms顺序显示】
         function simCallPlayPhraseRound() {
             if (!simCallActive || !simCallConnected) return 0;
 
-            const messageCount = Math.floor(Math.random() * 10) + 1; // 【本次修改：通话每轮 1-10 条】
+            const messageCount = Math.floor(Math.random() * 10) + 1;
             simCallBatchTimers.forEach(timer => clearTimeout(timer));
             simCallBatchTimers = [];
             simCallPrepareRecordSlots(messageCount);
@@ -6735,7 +6232,7 @@
 
                 const roundDuration = simCallPlayPhraseRound();
 
-                // 【本次修改：避免下一轮计时与当前1-10条字幕播放重叠】
+                // 【本次修改：避免下一轮计时与当前1-5条字幕播放重叠】
                 const nextRoundTimer = setTimeout(() => {
                     if (!simCallActive || !simCallConnected) return;
                     simCallScheduleNextRound();
@@ -6824,7 +6321,6 @@
             if (!simCallActive) return;
 
             const endedFriendId = simCallFriendId;
-            const callWasConnected = simCallConnected; // 【本次修改：仅已接通通话留下结束记录】
             simCallActive = false;
             simCallConnected = false;
             simCallFriendId = null;
@@ -6861,17 +6357,8 @@
                 scheduleActiveMessage(endedFriendId);
             }
 
-            if (friend && callWasConnected) { const record = { sender: 'bot', type: 'call_event', content: '通话结束', timestamp: Date.now() }; friend.messages.push(record); saveData(); if (appData.currentFriendId === endedFriendId) addMessageToChat(record); }
-            if (friend && friend.settings.incomingCallEnabled) scheduleIncomingCall(endedFriendId);
             updateChatStatusForCurrentFriend();
         }
-
-        // 【本次修改：各角色独立随机主动来电，2-10分钟重新随机】
-        function scheduleIncomingCall(friendId) { clearTimeout(incomingCallTimers[friendId]); const f = appData.friends[friendId]; if (!f || !f.settings.incomingCallEnabled) return; incomingCallTimers[friendId] = setTimeout(() => { const x = appData.friends[friendId]; if (!x || !x.settings.incomingCallEnabled) return; if (incomingCallFriendId || (simCallActive && simCallFriendId === friendId) || document.hidden) { scheduleIncomingCall(friendId); return; } incomingCallFriendId = friendId; incomingCallName.textContent = x.name || '聊天伙伴'; incomingCallAvatar.innerHTML = ''; if (x.avatarImage) { const im = document.createElement('img'); im.src = x.avatarImage; im.style.cssText = 'width:100%;height:100%;object-fit:cover'; incomingCallAvatar.appendChild(im) } else incomingCallAvatar.textContent = x.avatar || x.name.charAt(0); incomingCallBackground.style.backgroundImage = x.useCustomBackground && x.backgroundImage ? `url("${x.backgroundImage}")` : 'none'; incomingCallStartedAt = Date.now(); incomingCallDuration.textContent = '00:00'; clearInterval(incomingCallClockTimer); incomingCallClockTimer = setInterval(() => incomingCallDuration.textContent = simCallFormatDuration(Date.now() - incomingCallStartedAt), 1000); incomingCallOverlay.classList.add('active'); incomingCallOverlay.setAttribute('aria-hidden', 'false'); if (navigator.vibrate) navigator.vibrate([250, 150, 250]); }, (2 + Math.random() * 8) * 60 * 1000); }
-        function dismissIncomingCall(reschedule = true) { const id = incomingCallFriendId; incomingCallFriendId = null; clearInterval(incomingCallClockTimer); incomingCallOverlay.classList.remove('active'); incomingCallOverlay.setAttribute('aria-hidden', 'true'); if (reschedule && id && appData.friends[id]?.settings.incomingCallEnabled) scheduleIncomingCall(id); }
-        incomingCallDecline.addEventListener('click', () => dismissIncomingCall(true));
-        incomingCallAccept.addEventListener('click', () => { const id = incomingCallFriendId, f = id && appData.friends[id]; if (!f) return dismissIncomingCall(false); if (simCallActive && simCallFriendId !== id) endSimulatedCall(); if (simCallActive) return; dismissIncomingCall(false); simCallActive = true; simCallConnected = false; simCallFriendId = id; replyQueueGeneration[id] = (replyQueueGeneration[id] || 0) + 1; replyTaskQueues[id] = []; isProcessingQueues[id] = false; stopActiveSending(id); simCallRenderFriend(f); simCallOverlay.classList.remove('dialing', 'speaking'); simCallOverlay.classList.add('active'); simCallOverlay.setAttribute('aria-hidden', 'false'); simCallConnect(); });
-        function restartAllIncomingCalls() { Object.keys(appData.friends).forEach(id => { if (appData.friends[id].settings.incomingCallEnabled) scheduleIncomingCall(id) }) }
 
         if (callBtn) {
             callBtn.addEventListener('click', (event) => {
@@ -7016,9 +6503,9 @@
                 mainContainer.style.display = 'flex';
 
                 // 再次确保滚动到最新消息
-                setTimeout(() => { chatArea.scrollTop = chatArea.scrollHeight; }, 50);
-                // 【本次修改：恢复已开启角色的随机主动来电】
-                restartAllIncomingCalls();
+                setTimeout(() => {
+                    chatArea.scrollTop = chatArea.scrollHeight;
+                }, 50);
 
             } catch (error) {
                 console.error("初始化失败:", error);
