@@ -3331,13 +3331,29 @@
             object-fit: cover !important
         }
 
-        /* 【本次修改：通话结束记录】 */
+        /* 【本次修改：通话结束 / 撤回记录完全复用时间戳胶囊视觉】 */
         .call-event-row {
-            width: 100%;
             text-align: center;
-            color: #999;
-            font-size: 10px;
-            margin: 8px 0 14px
+            margin: 12px 0;
+            font-size: 9px;
+            color: #8e8e93;
+            position: relative;
+        }
+
+        .call-event-row span {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background-color: #ededed;
+            line-height: 1.4;
+        }
+
+        /* 【本次修改：禁止 iPhone/Safari 长按图片弹出系统保存菜单；不改图片点击预览】 */
+        .chat-area img {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
         /* 【本次修改：主动来电弹窗只新增必要样式，复用现有通话视觉】 */
@@ -4730,6 +4746,15 @@
                 minute: '2-digit'
             });
 
+            // 【本次修改：通话结束 / 撤回记录本身就是“时间戳位置”的胶囊，不再额外生成普通时间戳】
+            if (msg.type === 'call_event' || msg.type === 'recall_event') {
+                const row = document.createElement('div');
+                row.className = 'call-event-row';
+                row.innerHTML = `<span>${msg.content || (msg.type === 'recall_event' ? '你撤回了一条消息' : '通话结束')}</span>`;
+                fragment.appendChild(row);
+                return fragment;
+            }
+
             // ===== 时间分割线（只在需要时插入）=====
             if (
                 index === 0 ||
@@ -4754,9 +4779,6 @@
                 timeDivider.innerHTML = `<span>${text}</span>`;
                 fragment.appendChild(timeDivider);
             }
-
-            // 【本次修改：通话结束作为灰色时间戳式记录】
-            if (msg.type === 'call_event') { const row = document.createElement('div'); row.className = 'call-event-row'; row.textContent = `${currentTime} ${msg.content || '通话结束'}`; fragment.appendChild(row); return fragment; }
 
             // 1️⃣ 创建消息容器
             const messageContainer = document.createElement('div');
@@ -5272,6 +5294,12 @@
 
                     await saveData();
                     addMessageToChat(msg);
+                    /* 【本次修改：我主动发送语音后也强制滚到最新一条】 */
+                    isViewingHistory = false;
+                    requestAnimationFrame(() => {
+                        chatArea.scrollTop = chatArea.scrollHeight;
+                        updateJumpLatestButton();
+                    });
 
                     createReplyTask(friend.id, msg);
 
@@ -6496,7 +6524,7 @@
         }
         function showMessageActionMenu(index, container) {
             const f = getCurrentFriend(), msg = f.messages[index];
-            if (!msg || msg.type === 'call_event') return;
+            if (!msg || msg.type === 'call_event' || msg.type === 'recall_event') return;
 
             messageActionMenu.innerHTML = '';
             const labels = msg.sender === 'user' ? ['引用', '撤回'] : ['引用', '解析'];
@@ -6509,7 +6537,18 @@
                     closeMessageActionMenu();
                     if (label === '引用') beginManualQuote(index);
                     else if (label === '撤回') {
-                        f.messages.splice(index, 1);
+                        /* 【本次修改：撤回后不显示原消息；在时间戳位置保留“你撤回了一条消息”胶囊记录】 */
+                        const recalledMsg = f.messages[index];
+                        f.messages[index] = {
+                            sender: 'system',
+                            type: 'recall_event',
+                            content: '你撤回了一条消息',
+                            timestamp: recalledMsg.timestamp
+                        };
+                        /* 【本次修改：同步移除尚未处理的该消息回复任务，角色不能继续使用被撤回内容】 */
+                        if (replyTaskQueues[f.id]) {
+                            replyTaskQueues[f.id] = replyTaskQueues[f.id].filter(task => task.userMessage !== recalledMsg);
+                        }
                         saveData();
                         renderChat();
                     }
@@ -6547,7 +6586,10 @@
         chatArea.addEventListener('pointerdown', e => { const c = e.target.closest('.message-container'); if (!c) return; messagePressStart = { x: e.clientX, y: e.clientY }; clearTimeout(messagePressTimer); messagePressTimer = setTimeout(() => showMessageActionMenu(Number(c.dataset.messageIndex), c), 520) });
         chatArea.addEventListener('pointermove', e => { if (messagePressStart && Math.hypot(e.clientX - messagePressStart.x, e.clientY - messagePressStart.y) > 10) clearTimeout(messagePressTimer) });
         ['pointerup', 'pointercancel'].forEach(n => chatArea.addEventListener(n, () => { clearTimeout(messagePressTimer); messagePressStart = null }));
-        document.addEventListener('pointerdown', e => { if (!e.target.closest('#messageActionMenu') && !e.target.closest('.message-container')) closeMessageActionMenu() });
+        /* 【本次修改：只要点在操作栏之外就关闭；聊天区空白和其他消息都可直接取消】 */
+        document.addEventListener('pointerdown', e => { if (!e.target.closest('#messageActionMenu')) closeMessageActionMenu() });
+        /* 【本次修改：阻止图片原生 contextmenu，避免与自定义长按操作栏相撞】 */
+        chatArea.addEventListener('contextmenu', e => { if (e.target.closest('img')) e.preventDefault(); });
 
         // =========================================================
         // 【本次修改：模拟语音通话 V2 核心逻辑 开始】
