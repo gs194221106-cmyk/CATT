@@ -6193,11 +6193,11 @@
             simCallBatchTimers.push(fadeTimer, clearTimer);
         }
 
-        // 【本次修改：每轮随机1-5条，第一条在轮次触发时立即显示，后续按6500ms顺序显示】
+        // 【本次修改：每轮随机1-7条，第一条在轮次触发时立即显示，后续按6500ms顺序显示】
         function simCallPlayPhraseRound() {
             if (!simCallActive || !simCallConnected) return 0;
 
-            const messageCount = Math.floor(Math.random() * 10) + 1;
+            const messageCount = Math.floor(Math.random() * 7) + 1;
             simCallBatchTimers.forEach(timer => clearTimeout(timer));
             simCallBatchTimers = [];
             simCallPrepareRecordSlots(messageCount);
