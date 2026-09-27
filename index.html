@@ -20,7 +20,7 @@
             --bubble-user: #E7F2FF;
             --bubble-bot: #FFFFFF;
             --light-blue: var(--bubble-user);
-            --quote-bg-user: #FAFAFA;
+            --quote-bg-user: #ffffff;
             --quote-bg-bot: #FAFAFA;
             --quote-border-user: #c7d9ed;
             --quote-border-bot: var(--bubble-user);
@@ -2575,8 +2575,8 @@
 
         /* ===== 引用中的图片 / 表情包：强制缩略图限高（最终版） ===== */
         .quoted-content .quoted-text img.quoted-image {
-            max-height: 64px !important;
-            max-width: 64px !important;
+            max-height: 40px !important;
+            max-width: 40px !important;
             /* 🔥 只改这里 */
             width: auto !important;
             height: auto !important;
@@ -3292,8 +3292,21 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* 【本次修改：用直竖线替换原来的 border-left 分隔线】 */
         .action-menu-item+.action-menu-item {
-            border-left: 1px solid rgba(0, 0, 0, .045);
+            position: relative;
+            border-left: 0;
+        }
+
+        .action-menu-item+.action-menu-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 10px;
+            background: rgba(0, 0, 0, .30);
         }
 
         .action-menu-item:active {
@@ -3348,10 +3361,10 @@
 
         /* 【本次修改：引用图片/表情包缩略图固定尺寸；全屏预览仍按原图比例】 */
         .quoted-content .quoted-text img.quoted-image {
-            width: 64px !important;
-            height: 64px !important;
-            max-width: 64px !important;
-            max-height: 64px !important;
+            width: 40px !important;
+            height: 40px !important;
+            max-width: 40px !important;
+            max-height: 40px !important;
             object-fit: cover !important
         }
 
@@ -4330,7 +4343,7 @@
                 request.onupgradeneeded = function (event) {
                     const db = event.target.result;
                     if (!db.objectStoreNames.contains(STORE_NAME)) {
-                        const store = db.createObjectStore(STORE_NAME, {keyPath: 'id'});
+                        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
                         console.log("创建对象存储:", STORE_NAME);
                     }
                 };
@@ -4400,7 +4413,7 @@
 
                     const transaction = db.transaction([STORE_NAME], 'readwrite');
                     const store = transaction.objectStore(STORE_NAME);
-                    const request = store.put({id: 'appData', data: dataToSave});
+                    const request = store.put({ id: 'appData', data: dataToSave });
 
                     request.onsuccess = function (event) {
                         console.log("数据保存到IndexedDB成功");
@@ -4907,7 +4920,7 @@
                 const quotedContent = document.createElement('div');
                 quotedContent.className = 'quoted-content';
                 quotedContent.style.cursor = 'pointer';
-                quotedContent.addEventListener('click', (e) => {if (e.target.closest('img')) return; e.stopPropagation(); locateQuotedMessage(msg);});
+                quotedContent.addEventListener('click', (e) => { if (e.target.closest('img')) return; e.stopPropagation(); locateQuotedMessage(msg); });
 
                 const quoteSender = document.createElement('div');
                 quoteSender.className = 'quote-sender';
@@ -5244,18 +5257,18 @@
         //开始录音。
         async function startVoiceRecord() {
             try {
-                recordStream = await navigator.mediaDevices.getUserMedia({audio: true});
+                recordStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
                 let options = {};
 
                 if (MediaRecorder.isTypeSupported('audio/mp4;codecs=mp4a.40.2')) {
-                    options = {mimeType: 'audio/mp4;codecs=mp4a.40.2'};
+                    options = { mimeType: 'audio/mp4;codecs=mp4a.40.2' };
                 } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                    options = {mimeType: 'audio/mp4'};
+                    options = { mimeType: 'audio/mp4' };
                 } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-                    options = {mimeType: 'audio/webm;codecs=opus'};
+                    options = { mimeType: 'audio/webm;codecs=opus' };
                 } else {
-                    options = {mimeType: 'audio/webm'};
+                    options = { mimeType: 'audio/webm' };
                 }
 
                 mediaRecorder = new MediaRecorder(recordStream, options);
@@ -5289,7 +5302,7 @@
 
                 mediaRecorder.onstop = async () => {
                     try {
-                        const blob = new Blob(audioChunks, {type: mediaRecorder.mimeType});
+                        const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
                         const base64Audio = await blobToBase64(blob);
 
                         const duration = Math.max(
@@ -5798,7 +5811,7 @@
                     lastDate = currentDate;
                 }
 
-                const timeStr = msgDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const senderName = msg.sender === 'user' ? appData.userName : currentFriend.name;
 
                 exportTextContent += `${timeStr} ${senderName}：`;
@@ -6384,7 +6397,7 @@
         });
 
         // 【本次修改：主动来电开关】
-        incomingCallToggle.addEventListener('change', () => {const f = getCurrentFriend(); f.settings.incomingCallEnabled = incomingCallToggle.checked; saveData(); if (f.settings.incomingCallEnabled) scheduleIncomingCall(f.id); else clearTimeout(incomingCallTimers[f.id]);});
+        incomingCallToggle.addEventListener('change', () => { const f = getCurrentFriend(); f.settings.incomingCallEnabled = incomingCallToggle.checked; saveData(); if (f.settings.incomingCallEnabled) scheduleIncomingCall(f.id); else clearTimeout(incomingCallTimers[f.id]); });
 
         // 引用消息回复开关事件
         quoteReplyToggle.addEventListener('change', () => {
@@ -6583,15 +6596,15 @@
         // =========================================================
         // 【本次修改：历史浏览 + 引用定位 + 长按消息操作】
         // =========================================================
-        function isNearChatBottom() {return chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 44;}
-        function updateJumpLatestButton() {const show = isViewingHistory && !isNearChatBottom(); jumpLatestBtn.classList.toggle('visible', show);}
-        chatArea.addEventListener('scroll', () => {isViewingHistory = !isNearChatBottom(); updateJumpLatestButton();}, {passive: true});
-        jumpLatestBtn.addEventListener('click', () => {isViewingHistory = false; chatArea.scrollTo({top: chatArea.scrollHeight, behavior: 'smooth'}); updateJumpLatestButton();});
-        function quoteSummary(msg) {if (!msg) return ''; if (msg.type === 'voice') return '[语音消息]'; if (msg.type === 'image' || msg.type === 'sticker') return msg.content; return String(msg.content ?? '');}
-        function clearManualQuote() {manualQuoteTarget = null; manualQuotePreview.classList.remove('active');}
+        function isNearChatBottom() { return chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 44; }
+        function updateJumpLatestButton() { const show = isViewingHistory && !isNearChatBottom(); jumpLatestBtn.classList.toggle('visible', show); }
+        chatArea.addEventListener('scroll', () => { isViewingHistory = !isNearChatBottom(); updateJumpLatestButton(); }, { passive: true });
+        jumpLatestBtn.addEventListener('click', () => { isViewingHistory = false; chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' }); updateJumpLatestButton(); });
+        function quoteSummary(msg) { if (!msg) return ''; if (msg.type === 'voice') return '[语音消息]'; if (msg.type === 'image' || msg.type === 'sticker') return msg.content; return String(msg.content ?? ''); }
+        function clearManualQuote() { manualQuoteTarget = null; manualQuotePreview.classList.remove('active'); }
         manualQuoteCancel.addEventListener('click', clearManualQuote);
-        function beginManualQuote(index) {const f = getCurrentFriend(), msg = f.messages[index]; if (!msg) return; manualQuoteTarget = {index, msg}; const t = quoteSummary(msg); manualQuotePreviewText.textContent = (msg.sender === 'user' ? appData.userName : f.name) + '：' + ((msg.type === 'image' || msg.type === 'sticker') ? '[图片]' : t.slice(0, 45)); manualQuotePreview.classList.add('active'); messageInput.focus();}
-        function locateQuotedMessage(msg) {const f = getCurrentFriend(); let idx = -1; if (msg.quoteTargetTimestamp) idx = f.messages.findIndex(m => m.timestamp === msg.quoteTargetTimestamp); if (idx < 0) {for (let i = f.messages.length - 1; i >= 0; i--) {if (i === f.messages.indexOf(msg)) continue; if (quoteSummary(f.messages[i]) === msg.quote) {idx = i; break;} } } if (idx < 0) return; const el = chatArea.querySelector(`.message-container[data-message-index="${idx}"]`); if (!el) return; isViewingHistory = true; el.scrollIntoView({behavior: 'smooth', block: 'center'}); el.classList.remove('message-locate-flash'); requestAnimationFrame(() => el.classList.add('message-locate-flash')); setTimeout(() => el.classList.remove('message-locate-flash'), 1300); updateJumpLatestButton();}
+        function beginManualQuote(index) { const f = getCurrentFriend(), msg = f.messages[index]; if (!msg) return; manualQuoteTarget = { index, msg }; const t = quoteSummary(msg); manualQuotePreviewText.textContent = (msg.sender === 'user' ? appData.userName : f.name) + '：' + ((msg.type === 'image' || msg.type === 'sticker') ? '[图片]' : t.slice(0, 45)); manualQuotePreview.classList.add('active'); messageInput.focus(); }
+        function locateQuotedMessage(msg) { const f = getCurrentFriend(); let idx = -1; if (msg.quoteTargetTimestamp) idx = f.messages.findIndex(m => m.timestamp === msg.quoteTargetTimestamp); if (idx < 0) { for (let i = f.messages.length - 1; i >= 0; i--) { if (i === f.messages.indexOf(msg)) continue; if (quoteSummary(f.messages[i]) === msg.quote) { idx = i; break; } } } if (idx < 0) return; const el = chatArea.querySelector(`.message-container[data-message-index="${idx}"]`); if (!el) return; isViewingHistory = true; el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.remove('message-locate-flash'); requestAnimationFrame(() => el.classList.add('message-locate-flash')); setTimeout(() => el.classList.remove('message-locate-flash'), 1300); updateJumpLatestButton(); }
         function closeMessageActionMenu() {
             messageActionMenu.classList.remove('active');
             messageActionMenu.innerHTML = '';
@@ -6659,13 +6672,13 @@
             messageActionMenu.style.visibility = 'visible';
         }
         let messagePressTimer = null, messagePressStart = null;
-        chatArea.addEventListener('pointerdown', e => {const c = e.target.closest('.message-container'); if (!c) return; messagePressStart = {x: e.clientX, y: e.clientY}; clearTimeout(messagePressTimer); messagePressTimer = setTimeout(() => showMessageActionMenu(Number(c.dataset.messageIndex), c), 520)});
-        chatArea.addEventListener('pointermove', e => {if (messagePressStart && Math.hypot(e.clientX - messagePressStart.x, e.clientY - messagePressStart.y) > 10) clearTimeout(messagePressTimer)});
-        ['pointerup', 'pointercancel'].forEach(n => chatArea.addEventListener(n, () => {clearTimeout(messagePressTimer); messagePressStart = null}));
+        chatArea.addEventListener('pointerdown', e => { const c = e.target.closest('.message-container'); if (!c) return; messagePressStart = { x: e.clientX, y: e.clientY }; clearTimeout(messagePressTimer); messagePressTimer = setTimeout(() => showMessageActionMenu(Number(c.dataset.messageIndex), c), 520) });
+        chatArea.addEventListener('pointermove', e => { if (messagePressStart && Math.hypot(e.clientX - messagePressStart.x, e.clientY - messagePressStart.y) > 10) clearTimeout(messagePressTimer) });
+        ['pointerup', 'pointercancel'].forEach(n => chatArea.addEventListener(n, () => { clearTimeout(messagePressTimer); messagePressStart = null }));
         /* 【本次修改：只要点在操作栏之外就关闭；聊天区空白和其他消息都可直接取消】 */
-        document.addEventListener('pointerdown', e => {if (!e.target.closest('#messageActionMenu')) closeMessageActionMenu()});
+        document.addEventListener('pointerdown', e => { if (!e.target.closest('#messageActionMenu')) closeMessageActionMenu() });
         /* 【本次修改：阻止图片原生 contextmenu，避免与自定义长按操作栏相撞】 */
-        chatArea.addEventListener('contextmenu', e => {if (e.target.closest('img')) e.preventDefault();});
+        chatArea.addEventListener('contextmenu', e => { if (e.target.closest('img')) e.preventDefault(); });
 
         // =========================================================
         // 【本次修改：模拟语音通话 V2 核心逻辑 开始】
@@ -6964,8 +6977,8 @@
         }
 
         // 【本次修改：各角色独立随机主动来电，2-10分钟重新随机】
-        function scheduleIncomingCall(friendId) {clearTimeout(incomingCallTimers[friendId]); const f = appData.friends[friendId]; if (!f || !f.settings.incomingCallEnabled) return; incomingCallTimers[friendId] = setTimeout(() => {const x = appData.friends[friendId]; if (!x || !x.settings.incomingCallEnabled) return; if (incomingCallFriendId || (simCallActive && simCallFriendId === friendId) || document.hidden) {scheduleIncomingCall(friendId); return;} incomingCallFriendId = friendId; incomingCallName.textContent = x.name || '聊天伙伴'; incomingCallAvatar.innerHTML = ''; if (x.avatarImage) {const im = document.createElement('img'); im.src = x.avatarImage; im.style.cssText = 'width:100%;height:100%;object-fit:cover'; incomingCallAvatar.appendChild(im)} else incomingCallAvatar.textContent = x.avatar || x.name.charAt(0); incomingCallBackground.style.backgroundImage = x.useCustomBackground && x.backgroundImage ? `url("${x.backgroundImage}")` : 'none'; incomingCallStartedAt = Date.now(); incomingCallDuration.textContent = '00:00'; clearInterval(incomingCallClockTimer); incomingCallClockTimer = setInterval(() => incomingCallDuration.textContent = simCallFormatDuration(Date.now() - incomingCallStartedAt), 1000); incomingCallOverlay.classList.add('active'); incomingCallOverlay.setAttribute('aria-hidden', 'false'); if (navigator.vibrate) navigator.vibrate([250, 150, 250]);}, (2 + Math.random() * 8) * 60 * 1000);}
-        function dismissIncomingCall(reschedule = true) {const id = incomingCallFriendId; incomingCallFriendId = null; clearInterval(incomingCallClockTimer); incomingCallOverlay.classList.remove('active'); incomingCallOverlay.setAttribute('aria-hidden', 'true'); if (reschedule && id && appData.friends[id]?.settings.incomingCallEnabled) scheduleIncomingCall(id);}
+        function scheduleIncomingCall(friendId) { clearTimeout(incomingCallTimers[friendId]); const f = appData.friends[friendId]; if (!f || !f.settings.incomingCallEnabled) return; incomingCallTimers[friendId] = setTimeout(() => { const x = appData.friends[friendId]; if (!x || !x.settings.incomingCallEnabled) return; if (incomingCallFriendId || (simCallActive && simCallFriendId === friendId) || document.hidden) { scheduleIncomingCall(friendId); return; } incomingCallFriendId = friendId; incomingCallName.textContent = x.name || '聊天伙伴'; incomingCallAvatar.innerHTML = ''; if (x.avatarImage) { const im = document.createElement('img'); im.src = x.avatarImage; im.style.cssText = 'width:100%;height:100%;object-fit:cover'; incomingCallAvatar.appendChild(im) } else incomingCallAvatar.textContent = x.avatar || x.name.charAt(0); incomingCallBackground.style.backgroundImage = x.useCustomBackground && x.backgroundImage ? `url("${x.backgroundImage}")` : 'none'; incomingCallStartedAt = Date.now(); incomingCallDuration.textContent = '00:00'; clearInterval(incomingCallClockTimer); incomingCallClockTimer = setInterval(() => incomingCallDuration.textContent = simCallFormatDuration(Date.now() - incomingCallStartedAt), 1000); incomingCallOverlay.classList.add('active'); incomingCallOverlay.setAttribute('aria-hidden', 'false'); if (navigator.vibrate) navigator.vibrate([250, 150, 250]); }, (2 + Math.random() * 8) * 60 * 1000); }
+        function dismissIncomingCall(reschedule = true) { const id = incomingCallFriendId; incomingCallFriendId = null; clearInterval(incomingCallClockTimer); incomingCallOverlay.classList.remove('active'); incomingCallOverlay.setAttribute('aria-hidden', 'true'); if (reschedule && id && appData.friends[id]?.settings.incomingCallEnabled) scheduleIncomingCall(id); }
         // 【本次修改：用户拒接后写入“你已拒绝本次通话”胶囊；该用户行为在当前聊天中强制滚到最新】
         incomingCallDecline.addEventListener('click', () => {
             const declinedFriendId = incomingCallFriendId;
@@ -6994,8 +7007,8 @@
                 });
             }
         });
-        incomingCallAccept.addEventListener('click', () => {const id = incomingCallFriendId, f = id && appData.friends[id]; if (!f) return dismissIncomingCall(false); if (simCallActive && simCallFriendId !== id) endSimulatedCall(); if (simCallActive) return; dismissIncomingCall(false); simCallActive = true; simCallConnected = false; simCallFriendId = id; replyQueueGeneration[id] = (replyQueueGeneration[id] || 0) + 1; replyTaskQueues[id] = []; isProcessingQueues[id] = false; stopActiveSending(id); simCallRenderFriend(f); simCallOverlay.classList.remove('dialing', 'speaking'); simCallOverlay.classList.add('active'); simCallOverlay.setAttribute('aria-hidden', 'false'); simCallConnect();});
-        function restartAllIncomingCalls() {Object.keys(appData.friends).forEach(id => {if (appData.friends[id].settings.incomingCallEnabled) scheduleIncomingCall(id)})}
+        incomingCallAccept.addEventListener('click', () => { const id = incomingCallFriendId, f = id && appData.friends[id]; if (!f) return dismissIncomingCall(false); if (simCallActive && simCallFriendId !== id) endSimulatedCall(); if (simCallActive) return; dismissIncomingCall(false); simCallActive = true; simCallConnected = false; simCallFriendId = id; replyQueueGeneration[id] = (replyQueueGeneration[id] || 0) + 1; replyTaskQueues[id] = []; isProcessingQueues[id] = false; stopActiveSending(id); simCallRenderFriend(f); simCallOverlay.classList.remove('dialing', 'speaking'); simCallOverlay.classList.add('active'); simCallOverlay.setAttribute('aria-hidden', 'false'); simCallConnect(); });
+        function restartAllIncomingCalls() { Object.keys(appData.friends).forEach(id => { if (appData.friends[id].settings.incomingCallEnabled) scheduleIncomingCall(id) }) }
 
         if (callBtn) {
             callBtn.addEventListener('click', (event) => {
@@ -7140,7 +7153,7 @@
                 mainContainer.style.display = 'flex';
 
                 // 再次确保滚动到最新消息
-                setTimeout(() => {chatArea.scrollTop = chatArea.scrollHeight;}, 50);
+                setTimeout(() => { chatArea.scrollTop = chatArea.scrollHeight; }, 50);
                 // 【本次修改：恢复已开启角色的随机主动来电】
                 restartAllIncomingCalls();
 
@@ -7180,21 +7193,21 @@
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
-        }, {passive: false});
+        }, { passive: false });
 
         // 防止好友面板左右滑动
         friendsPanel.addEventListener('touchmove', function (e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
-        }, {passive: false});
+        }, { passive: false });
 
         // 限制表情包选择框只能上下滑动
         stickerPicker.addEventListener('touchmove', function (e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
-        }, {passive: false});
+        }, { passive: false });
 
         // 离线缓存开关（开发期一定是 false）
         const ENABLE_SW = true;
