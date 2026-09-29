@@ -439,14 +439,16 @@
         }
 
         .chat-area {
-            --message-avatar-size: 32px;
+            /* 【本次修改：聊天头像整体放大；左右间距保持原值】 */
+            --message-avatar-size: 38px;
             --message-avatar-gap: 10px;
         }
 
         /* 气泡容器（头像 + 气泡整体） */
         .message-container {
             display: flex;
-            margin-bottom: 17.5px;
+            /* 【本次修改：增加每条消息之间的留白】 */
+            margin-bottom: 22px;
 
             max-width: 85%;
             /* ⭐ 关键：整体限制 */
@@ -472,10 +474,12 @@
             position: relative;
             animation: fadeIn 0.3s ease;
 
-            font-size: 12.5px;
-            line-height: 1.35;
+            /* 【本次修改：配合放大的消息头像，适度放大普通消息文字】 */
+            font-size: 14px;
+            line-height: 1.4;
 
-            max-width: calc(100% - var(--avatar-size) - var(--avatar-gap));
+            /* 【本次修改：气泡可用宽度按放大后的消息头像准确计算】 */
+            max-width: calc(100% - var(--message-avatar-size) - var(--message-avatar-gap));
             white-space: pre-wrap;
             word-break: break-word;
         }
@@ -2236,7 +2240,8 @@
         .quoted-content {
             box-sizing: border-box;
             display: inline-flex;
-            align-items: flex-start;
+            /* 【本次修改：引用气泡中的文字与发送者在卡片内垂直居中】 */
+            align-items: center;
             max-width: 220px;
             min-height: 30px;
             max-height: 44px;
@@ -2249,25 +2254,23 @@
             overflow: hidden;
         }
 
-        /* 【本次修改：文字引用保持“发送者：内容”横排，最多两行】 */
+        /* 【本次修改：文字引用保持“发送者：内容”横排，卡片尺寸数值不变】 */
         .quoted-content.quoted-inline-text {
             gap: 3px;
             min-width: 74px;
+            align-items: center;
         }
 
         .quoted-inline-text .quote-sender {
             white-space: nowrap;
         }
 
-        /* 【本次修改：引用文字最多两行，超出部分省略】 */
+        /* 【本次修改：所有文字引用最多单行显示，超出部分省略；字号与尺寸数值保持不变】 */
         .quoted-content:not(.quoted-media) .quoted-text {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
+            display: block;
+            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            overflow-wrap: anywhere;
         }
 
         .quoted-inline-text .quoted-text {
@@ -2310,12 +2313,14 @@
         .quote-sender {
             flex: 0 0 auto;
             font-size: 10px;
+            /* 【本次修改：引用发送者名称颜色加深，与引用正文统一】 */
+            color: #626a73;
         }
 
-        /* 【本次修改：所有引用气泡内容统一使用发送者名称的浅灰色】 */
+        /* 【本次修改：加深引用文字颜色；字号和卡片尺寸数值保持不变】 */
         .quoted-text {
             font-size: 10px;
-            color: var(--wechat-time);
+            color: #626a73;
             margin-top: 3px;
         }
 
@@ -2333,9 +2338,10 @@
             max-width: 100%;
             padding: 8px 12px;
             border-radius: 14px;
-            font-size: 12.5px;
+            /* 【本次修改：正文气泡字体与普通文本消息统一放大】 */
+            font-size: 14px;
             color: var(--wechat-text);
-            line-height: 1.35;
+            line-height: 1.4;
             white-space: pre-wrap;
             word-break: break-word;
         }
@@ -5114,19 +5120,8 @@
                 messageWithQuote.appendChild(quoteGroup);
                 messageWithQuote.appendChild(mainContent);
                 messageDiv.appendChild(messageWithQuote);
-                // 【本次修改：根据整个引用卡片的实际高度判断文字为一行还是两行，并保留23px/36px数值】
-                if (!isQuotedMedia) {
-                    const updateTextQuoteAccentHeight = () => {
-                        const quoteCardHeight = quotedContent.getBoundingClientRect().height;
-                        if (quoteCardHeight <= 0) return; // 引用卡暂时隐藏时，等它显示后再测量
-                        quoteAccent.style.height = `${quoteCardHeight > 30 ? 36 : 23}px`;
-                    };
-
-                    // 【本次修改：监听引用卡从隐藏到显示或宽度变化，避免两行内容误判成单行】
-                    const quoteAccentResizeObserver = new ResizeObserver(updateTextQuoteAccentHeight);
-                    quoteAccentResizeObserver.observe(quotedContent);
-                    requestAnimationFrame(updateTextQuoteAccentHeight);
-                }
+                // 【本次修改：文字引用固定单行，竖线保留原有23px数值】
+                if (!isQuotedMedia) quoteAccent.style.height = '23px';
                 // ===== 让「引用消息里的图片 / 表情包」可点击预览 =====
                 const quotedImgs = quotedContent.querySelectorAll('img');
 
@@ -5515,15 +5510,9 @@
                     friend.messages.push(msg);
 
                     await saveData();
-                    /* 【本次修改：用户发送语音时先退出历史浏览，再插入消息，确保与文字/图片一致自动滚到最新】 */
+                    /* 【本次修改：用户语音发送统一强制跟随最新，由 addMessageToChat 单一处理滚动】 */
                     isViewingHistory = false;
-                    addMessageToChat(msg);
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            chatArea.scrollTop = chatArea.scrollHeight;
-                            updateJumpLatestButton();
-                        });
-                    });
+                    addMessageToChat(msg, true);
 
                     createReplyTask(friend.id, msg);
 
@@ -5561,10 +5550,9 @@
             }
 
             currentFriend.messages.push(userMessage);
-            /* 【本次修改：用户发送文字 / 图片 / 表情包时，先退出历史浏览，再插入消息，统一自动滚到最新】 */
+            /* 【本次修改：用户发送文字 / 图片 / 表情包统一由单一滚动入口滚到最新】 */
             isViewingHistory = false;
-            addMessageToChat(userMessage);
-            scrollUserMessageToLatest(currentFriend.id); // 【本次修改：用户消息布局稳定后再次校准到底部】
+            addMessageToChat(userMessage, true);
 
             // 保存数据（包括用户消息）
             await saveData();
@@ -5816,30 +5804,22 @@
         }
 
         //发送消息。
-        function addMessageToChat(msg) {
+        function addMessageToChat(msg, forceFollowLatest = false) {
             const currentFriend = getCurrentFriend();
             const index = currentFriend.messages.length - 1;
 
-            /* 【本次修改：在插入新消息前记录当前是否处于“最新消息”状态】
-               - 未浏览历史：角色/用户新消息都继续跟随到最新；
-               - 正在浏览历史：角色消息不抢位置；用户发送入口会先把 isViewingHistory 设为 false，因此用户消息仍优先滚到最新。 */
-            const shouldFollowLatest = !isViewingHistory;
+            /* 【本次修改：普通新消息沿用浏览历史规则；用户发送或明确行为可要求跟随最新】 */
+            const shouldFollowLatest = forceFollowLatest || !isViewingHistory;
 
             // ✅ 直接复用已有的单条渲染逻辑
             const node = renderSingleMessage(msg, index, currentFriend);
-
+            /* 【本次修改：在文档片段插入前保存消息元素，供统一尺寸观察使用】 */
+            const messageElement = node.querySelector('.message-container');
             chatArea.appendChild(node);
 
-            /* 【本次修改：依据“消息插入前”的浏览状态决定是否跟随，避免追加消息后滚动事件误把状态判成浏览历史】 */
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    if (shouldFollowLatest) {
-                        isViewingHistory = false;
-                        chatArea.scrollTop = chatArea.scrollHeight;
-                    }
-                    updateJumpLatestButton();
-                });
-            });
+            /* 【本次修改：所有追加消息统一交由单一滚动函数处理，避免重复校准互相竞争】 */
+            if (shouldFollowLatest) scrollChatToLatest(currentFriend.id, messageElement);
+            else updateJumpLatestButton();
         }
 
         // 添加语音（最终稳定版）
@@ -6754,34 +6734,46 @@
         // =========================================================
         // 【本次修改：历史浏览 + 引用定位 + 长按消息操作】
         // =========================================================
-        /* 【本次修改：用户发送后补偿图片解码、字体/布局恢复造成的高度变化】
-           多次短延迟校准，且监听新消息内图片加载；不改变角色消息滚动规则。 */
-        function scrollUserMessageToLatest(friendId) {
-            const latestUserMessage = chatArea.querySelector('.user-container:last-of-type');
-            let lastAutoScrollTop = chatArea.scrollTop;
-            const scrollNow = (force = false) => {
-                if (!getCurrentFriend() || getCurrentFriend().id !== friendId) return; // 【本次修改：避免切换好友后旧任务滚动新会话】
-                // 【本次修改：仅在用户未手动改变滚动位置时做延迟校准，避免把用户拉回底部】
-                if (!force && Math.abs(chatArea.scrollTop - lastAutoScrollTop) > 2) return;
+        /* 【本次修改：统一处理用户/角色消息和明确行为后的滚动，并监听视口及新消息尺寸变化】 */
+        let activeChatScrollCleanup = null;
+        function scrollChatToLatest(friendId, observedMessage = null) {
+            /* 【本次修改：新滚动任务先结束旧观察器，确保同一时间只有一套自动滚动校准】 */
+            if (activeChatScrollCleanup) activeChatScrollCleanup();
+            let cancelledByUser = false;
+            const stopFollowing = () => { cancelledByUser = true; };
+            const scrollNow = () => {
+                const activeFriend = getCurrentFriend();
+                if (cancelledByUser || !activeFriend || activeFriend.id !== friendId) return;
                 isViewingHistory = false;
                 chatArea.scrollTop = chatArea.scrollHeight;
-                lastAutoScrollTop = chatArea.scrollTop;
                 updateJumpLatestButton();
             };
-            scrollNow(true); // 【本次修改：发送后立即滚动，不等待任何延迟任务】
-            requestAnimationFrame(() => requestAnimationFrame(() => scrollNow()));
-            [80, 240, 650].forEach(delay => setTimeout(() => scrollNow(), delay));
-            if (latestUserMessage) {
-                latestUserMessage.querySelectorAll('img').forEach(img => {
-                    if (!img.complete) img.addEventListener('load', () => scrollNow(), { once: true });
-                });
-                // 【本次修改：观察新消息短时间内的高度变化；仅校准未被用户手动移动的位置】
-                if (typeof ResizeObserver !== 'undefined') {
-                    const messageResizeObserver = new ResizeObserver(() => scrollNow());
-                    messageResizeObserver.observe(latestUserMessage);
-                    setTimeout(() => messageResizeObserver.disconnect(), 2000);
-                }
+
+            /* 【本次修改：发送/行为操作后立即定位，并在两帧布局完成后再校准一次】 */
+            scrollNow();
+            requestAnimationFrame(() => requestAnimationFrame(scrollNow));
+
+            /* 【本次修改：若用户主动开始滚动，停止后续校准；避免观察器把用户拉回底部】 */
+            chatArea.addEventListener('wheel', stopFollowing, { passive: true, once: true });
+            chatArea.addEventListener('touchstart', stopFollowing, { passive: true, once: true });
+            chatArea.addEventListener('pointerdown', stopFollowing, { passive: true, once: true });
+
+            /* 【本次修改：只观察可见区域和最新消息的真实尺寸变化，替代多组延迟定时器】 */
+            let resizeObserver = null;
+            if (typeof ResizeObserver !== 'undefined') {
+                resizeObserver = new ResizeObserver(scrollNow);
+                resizeObserver.observe(chatArea);
+                if (observedMessage) resizeObserver.observe(observedMessage);
             }
+            const cleanup = () => {
+                if (resizeObserver) resizeObserver.disconnect();
+                chatArea.removeEventListener('wheel', stopFollowing);
+                chatArea.removeEventListener('touchstart', stopFollowing);
+                chatArea.removeEventListener('pointerdown', stopFollowing);
+                if (activeChatScrollCleanup === cleanup) activeChatScrollCleanup = null;
+            };
+            activeChatScrollCleanup = cleanup;
+            setTimeout(cleanup, 1600);
         }
 
         function isNearChatBottom() { return chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 44; }
@@ -7149,15 +7141,9 @@
                 friend.messages.push(record);
                 saveData();
                 if (appData.currentFriendId === endedFriendId) {
-                    // 【本次修改：用户主动挂断/取消通话属于用户行为，必须立即滚到最新】
+                    // 【本次修改：挂断/取消通话记录统一由单一滚动入口滚到最新】
                     isViewingHistory = false;
-                    addMessageToChat(record);
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            chatArea.scrollTop = chatArea.scrollHeight;
-                            updateJumpLatestButton();
-                        });
-                    });
+                    addMessageToChat(record, true);
                 }
             }
             if (friend && friend.settings.incomingCallEnabled) scheduleIncomingCall(endedFriendId);
@@ -7167,7 +7153,7 @@
         // 【本次修改：各角色独立随机主动来电，2-10分钟重新随机】
         function scheduleIncomingCall(friendId) { clearTimeout(incomingCallTimers[friendId]); const f = appData.friends[friendId]; if (!f || !f.settings.incomingCallEnabled) return; incomingCallTimers[friendId] = setTimeout(() => { const x = appData.friends[friendId]; if (!x || !x.settings.incomingCallEnabled) return; if (incomingCallFriendId || (simCallActive && simCallFriendId === friendId) || document.hidden) { scheduleIncomingCall(friendId); return; } incomingCallFriendId = friendId; incomingCallName.textContent = x.name || '聊天伙伴'; incomingCallAvatar.innerHTML = ''; if (x.avatarImage) { const im = document.createElement('img'); im.src = x.avatarImage; im.style.cssText = 'width:100%;height:100%;object-fit:cover'; incomingCallAvatar.appendChild(im) } else incomingCallAvatar.textContent = x.avatar || x.name.charAt(0); incomingCallBackground.style.backgroundImage = x.useCustomBackground && x.backgroundImage ? `url("${x.backgroundImage}")` : 'none'; incomingCallStartedAt = Date.now(); incomingCallDuration.textContent = '00:00'; clearInterval(incomingCallClockTimer); incomingCallClockTimer = setInterval(() => incomingCallDuration.textContent = simCallFormatDuration(Date.now() - incomingCallStartedAt), 1000); incomingCallOverlay.classList.add('active'); incomingCallOverlay.setAttribute('aria-hidden', 'false'); if (navigator.vibrate) navigator.vibrate([250, 150, 250]); }, (2 + Math.random() * 8) * 60 * 1000); }
         function dismissIncomingCall(reschedule = true) { const id = incomingCallFriendId; incomingCallFriendId = null; clearInterval(incomingCallClockTimer); incomingCallOverlay.classList.remove('active'); incomingCallOverlay.setAttribute('aria-hidden', 'true'); if (reschedule && id && appData.friends[id]?.settings.incomingCallEnabled) scheduleIncomingCall(id); }
-        // 【本次修改：用户拒接后写入“你已拒绝本次通话”胶囊；该用户行为在当前聊天中强制滚到最新】
+        // 【本次修改：用户拒接后写入记录，并通过统一滚动入口滚到最新】
         incomingCallDecline.addEventListener('click', () => {
             const declinedFriendId = incomingCallFriendId;
             const friend = declinedFriendId ? appData.friends[declinedFriendId] : null;
@@ -7186,13 +7172,7 @@
 
             if (appData.currentFriendId === declinedFriendId) {
                 isViewingHistory = false;
-                addMessageToChat(record);
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        chatArea.scrollTop = chatArea.scrollHeight;
-                        updateJumpLatestButton();
-                    });
-                });
+                addMessageToChat(record, true);
             }
         });
         incomingCallAccept.addEventListener('click', () => { const id = incomingCallFriendId, f = id && appData.friends[id]; if (!f) return dismissIncomingCall(false); if (simCallActive && simCallFriendId !== id) endSimulatedCall(); if (simCallActive) return; dismissIncomingCall(false); simCallActive = true; simCallConnected = false; simCallFriendId = id; replyQueueGeneration[id] = (replyQueueGeneration[id] || 0) + 1; replyTaskQueues[id] = []; isProcessingQueues[id] = false; stopActiveSending(id); simCallRenderFriend(f); simCallOverlay.classList.remove('dialing', 'speaking'); simCallOverlay.classList.add('active'); simCallOverlay.setAttribute('aria-hidden', 'false'); simCallConnect(); });
