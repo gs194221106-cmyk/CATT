@@ -2187,40 +2187,177 @@
             background-color: rgba(0, 0, 0, 0.05);
         }
 
-        /* 引用消息的整体气泡样式 */
+        /* 【本次修改：引用消息拆成引用小气泡 + 独立正文气泡】 */
+        .message.has-quote {
+            background: none !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
         .message-with-quote {
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            /* 【本次修改：拉开引用区域与独立正文气泡的距离】 */
             width: 100%;
         }
 
-        /* 【本次修改：角色引用小气泡使用独立背景色】 */
+        /* 【本次修改：用户引用气泡与正文气泡右边缘对齐；角色仍左对齐】 */
+        .user-message .message-with-quote {
+            align-items: flex-end;
+        }
+
+        /* 【本次修改：引用卡与外侧竖线分开；两者组成同一引用区域】 */
+        .quote-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            max-width: 100%;
+        }
+
+        /* 【本次修改：引用竖线按文字行数固定为22px或44px】 */
+        .quote-accent {
+            flex: 0 0 2.5px;
+            width: 2.5px;
+            height: 23px;
+            background-color: #717171;
+            border-radius: 2px;
+        }
+
+        /* 【本次修改：图片/表情包引用固定两行高度，竖线固定为单行的两倍】 */
+        .quote-accent.quote-accent-media {
+            height: 36px;
+        }
+
+        /* 【本次修改：文字引用自然显示一至两行；图片/表情包卡固定为两行高度】 */
         .quoted-content {
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: flex-start;
+            max-width: 220px;
+            min-height: 30px;
+            max-height: 44px;
+            padding: 6px 9px;
             background-color: var(--quote-bg-bot);
-            border-radius: 8px;
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            border-left: 3.07px solid var(--quote-border-bot);
-            font-size: 11px;
+            border-radius: 10px;
+            font-size: 10px;
+            line-height: 16px;
             color: var(--wechat-time);
+            overflow: hidden;
         }
 
-        /* 【本次修改：用户引用小气泡单独使用浅蓝背景和左侧标识色】 */
-        .user-message .quoted-content {
-            background-color: var(--quote-bg-user);
-            border-left-color: var(--quote-border-user);
+        /* 【本次修改：文字引用保持“发送者：内容”横排，最多两行】 */
+        .quoted-content.quoted-inline-text {
+            gap: 3px;
+            min-width: 74px;
         }
 
+        .quoted-inline-text .quote-sender {
+            white-space: nowrap;
+        }
+
+        /* 【本次修改：引用文字最多两行，超出部分省略】 */
+        .quoted-content:not(.quoted-media) .quoted-text {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            overflow-wrap: anywhere;
+        }
+
+        .quoted-inline-text .quoted-text {
+            flex: 1 1 auto;
+            min-width: 0;
+            max-width: 160px;
+            margin-top: 0;
+        }
+
+        /* 【本次修改：图片/表情包引用固定两行；发送者名称与缩略图同排并顶部对齐】 */
+        .quoted-content.quoted-media {
+            height: 44px;
+            min-height: 44px;
+            max-height: 44px;
+            gap: 6px;
+            align-items: flex-start;
+        }
+
+        .quoted-media .quote-sender {
+            align-self: flex-start;
+            white-space: nowrap;
+        }
+
+        .quoted-media .quoted-text {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 0;
+        }
+
+        /* 【本次修改：缩略图按两行卡片居中尺寸32×32px，与发送者首行顶部对齐】 */
+        .quoted-content.quoted-media .quoted-text img.quoted-image {
+            width: 32px !important;
+            height: 32px !important;
+            max-width: 32px !important;
+            max-height: 32px !important;
+            object-fit: cover !important;
+            border-radius: 4px;
+        }
+
+        .quote-sender {
+            flex: 0 0 auto;
+            font-size: 10px;
+        }
+
+        /* 【本次修改：所有引用气泡内容统一使用发送者名称的浅灰色】 */
         .quoted-text {
-            font-size: 11px;
-            color: var(--wechat-text);
-            margin-top: 4px;
+            font-size: 10px;
+            color: var(--wechat-time);
+            margin-top: 3px;
         }
 
+        .quoted-media .quoted-text {
+            display: flex;
+            align-items: flex-start;
+            /* 【本次修改：引用媒体缩略图与引用者文字顶部对齐】 */
+            margin-top: 0;
+        }
+
+        /* 【本次修改：正文继续使用普通消息气泡；图片/表情包正文保留无气泡样式】 */
         .main-content {
+            box-sizing: border-box;
+            width: fit-content;
+            max-width: 100%;
+            padding: 8px 12px;
+            border-radius: 14px;
             font-size: 12.5px;
             color: var(--wechat-text);
             line-height: 1.35;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .user-message .main-content {
+            background-color: var(--bubble-user);
+            border-bottom-right-radius: 5px;
+            box-shadow: inset 0 -0.5px 1px rgba(0, 0, 0, 0.03);
+        }
+
+        .bot-message .main-content {
+            background-color: var(--bubble-bot);
+            border-bottom-left-radius: 5px;
+            box-shadow: inset 0 -0.5px 1px rgba(0, 0, 0, 0.03), 0 0.5px 1.5px rgba(0, 0, 0, 0.035);
+        }
+
+        .main-content.no-bubble {
+            width: auto;
+            padding: 0;
+            background: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
         }
 
         /* 优化图片上传区域 */
@@ -2575,8 +2712,9 @@
 
         /* ===== 引用中的图片 / 表情包：强制缩略图限高（最终版） ===== */
         .quoted-content .quoted-text img.quoted-image {
-            max-height: 40px !important;
-            max-width: 40px !important;
+            max-height: 32px !important;
+            /* 【本次修改：引用图片/表情包缩略图进一步缩小】 */
+            max-width: 32px !important;
             /* 🔥 只改这里 */
             width: auto !important;
             height: auto !important;
@@ -3361,10 +3499,11 @@
 
         /* 【本次修改：引用图片/表情包缩略图固定尺寸；全屏预览仍按原图比例】 */
         .quoted-content .quoted-text img.quoted-image {
-            width: 40px !important;
-            height: 40px !important;
-            max-width: 40px !important;
-            max-height: 40px !important;
+            width: 32px !important;
+            /* 【本次修改：引用图片/表情包缩略图固定为更小尺寸】 */
+            height: 32px !important;
+            max-width: 32px !important;
+            max-height: 32px !important;
             object-fit: cover !important
         }
 
@@ -4903,7 +5042,7 @@
 
             // 4️⃣ 判断是否无气泡
             const isNoBubble =
-                (msg.type === 'image' || msg.type === 'sticker') && !msg.quote;
+                msg.type === 'image' || msg.type === 'sticker'; // 【本次修改：带引用的图片/表情包正文也不显示外框气泡】
 
             // 5️⃣ 设置气泡 class
             messageDiv.className =
@@ -4916,19 +5055,27 @@
             if (msg.quote) {
                 const messageWithQuote = document.createElement('div');
                 messageWithQuote.className = 'message-with-quote';
+                messageDiv.classList.add('has-quote'); // 【本次修改：外层只负责排版，不再包住引用和正文】
+
+                const quoteGroup = document.createElement('div');
+                quoteGroup.className = 'quote-group'; // 【本次修改：分组容纳外置竖线与灰色引用卡】
+                quoteGroup.style.cursor = 'pointer';
+                quoteGroup.addEventListener('click', (e) => { if (e.target.closest('img')) return; e.stopPropagation(); locateQuotedMessage(msg); });
+
+                const quoteAccent = document.createElement('span');
+                const isQuotedMedia = msg.quoteType === 'image' || msg.quoteType === 'sticker';
+                quoteAccent.className = isQuotedMedia ? 'quote-accent quote-accent-media' : 'quote-accent'; // 【本次修改：图片/表情包引用竖线固定44px】
+                quoteAccent.setAttribute('aria-hidden', 'true');
+                quoteGroup.appendChild(quoteAccent);
 
                 const quotedContent = document.createElement('div');
                 quotedContent.className = 'quoted-content';
-                quotedContent.style.cursor = 'pointer';
-                quotedContent.addEventListener('click', (e) => { if (e.target.closest('img')) return; e.stopPropagation(); locateQuotedMessage(msg); });
+                quotedContent.classList.add(isQuotedMedia ? 'quoted-media' : 'quoted-inline-text'); // 【本次修改：图片/表情包恢复缩略图布局，文字引用保留一至两行】
 
                 const quoteSender = document.createElement('div');
                 quoteSender.className = 'quote-sender';
-                quoteSender.textContent =
-                    msg.quoteSender ||
-                    (msg.sender === 'user'
-                        ? appData.userName
-                        : currentFriend.name);
+                const quoteSenderName = msg.quoteSender || (msg.sender === 'user' ? appData.userName : currentFriend.name);
+                quoteSender.textContent = `${quoteSenderName}：`; // 【本次修改：所有引用类型统一显示“发送者：内容”】
 
                 const quoteText = document.createElement('div');
                 quoteText.className = 'quoted-text';
@@ -4944,9 +5091,10 @@
                     const img = document.createElement('img');
                     img.src = msg.quote;
                     img.className = 'quoted-image';
+                    img.alt = msg.quoteType === 'sticker' ? '表情包缩略图' : '图片缩略图'; // 【本次修改：图片/表情包引用恢复缩略图】
                     quoteText.appendChild(img);
                 } else if (msg.quoteType === 'voice') {
-                    quoteText.textContent = '（语音消息）'; // 【本次修改：引用语音消息时显示占位文字】
+                    quoteText.textContent = '[语音消息]'; // 【本次修改：语音引用占位文字统一使用方括号】
                 } else {
                     const quoteString = String(msg.quote ?? '');
                     quoteText.textContent =
@@ -4957,13 +5105,28 @@
 
                 const mainContent = document.createElement('div');
                 mainContent.className = 'main-content';
+                if (isNoBubble) mainContent.classList.add('no-bubble'); // 【本次修改：确保引用回复中的图片/表情包正文无气泡】
                 renderMessageContent(mainContent, msg);
 
                 quotedContent.appendChild(quoteSender);
                 quotedContent.appendChild(quoteText);
-                messageWithQuote.appendChild(quotedContent);
+                quoteGroup.appendChild(quotedContent);
+                messageWithQuote.appendChild(quoteGroup);
                 messageWithQuote.appendChild(mainContent);
                 messageDiv.appendChild(messageWithQuote);
+                // 【本次修改：根据整个引用卡片的实际高度判断文字为一行还是两行，并保留23px/36px数值】
+                if (!isQuotedMedia) {
+                    const updateTextQuoteAccentHeight = () => {
+                        const quoteCardHeight = quotedContent.getBoundingClientRect().height;
+                        if (quoteCardHeight <= 0) return; // 引用卡暂时隐藏时，等它显示后再测量
+                        quoteAccent.style.height = `${quoteCardHeight > 30 ? 36 : 23}px`;
+                    };
+
+                    // 【本次修改：监听引用卡从隐藏到显示或宽度变化，避免两行内容误判成单行】
+                    const quoteAccentResizeObserver = new ResizeObserver(updateTextQuoteAccentHeight);
+                    quoteAccentResizeObserver.observe(quotedContent);
+                    requestAnimationFrame(updateTextQuoteAccentHeight);
+                }
                 // ===== 让「引用消息里的图片 / 表情包」可点击预览 =====
                 const quotedImgs = quotedContent.querySelectorAll('img');
 
@@ -5401,12 +5564,7 @@
             /* 【本次修改：用户发送文字 / 图片 / 表情包时，先退出历史浏览，再插入消息，统一自动滚到最新】 */
             isViewingHistory = false;
             addMessageToChat(userMessage);
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    chatArea.scrollTop = chatArea.scrollHeight;
-                    updateJumpLatestButton();
-                });
-            });
+            scrollUserMessageToLatest(currentFriend.id); // 【本次修改：用户消息布局稳定后再次校准到底部】
 
             // 保存数据（包括用户消息）
             await saveData();
@@ -6596,6 +6754,36 @@
         // =========================================================
         // 【本次修改：历史浏览 + 引用定位 + 长按消息操作】
         // =========================================================
+        /* 【本次修改：用户发送后补偿图片解码、字体/布局恢复造成的高度变化】
+           多次短延迟校准，且监听新消息内图片加载；不改变角色消息滚动规则。 */
+        function scrollUserMessageToLatest(friendId) {
+            const latestUserMessage = chatArea.querySelector('.user-container:last-of-type');
+            let lastAutoScrollTop = chatArea.scrollTop;
+            const scrollNow = (force = false) => {
+                if (!getCurrentFriend() || getCurrentFriend().id !== friendId) return; // 【本次修改：避免切换好友后旧任务滚动新会话】
+                // 【本次修改：仅在用户未手动改变滚动位置时做延迟校准，避免把用户拉回底部】
+                if (!force && Math.abs(chatArea.scrollTop - lastAutoScrollTop) > 2) return;
+                isViewingHistory = false;
+                chatArea.scrollTop = chatArea.scrollHeight;
+                lastAutoScrollTop = chatArea.scrollTop;
+                updateJumpLatestButton();
+            };
+            scrollNow(true); // 【本次修改：发送后立即滚动，不等待任何延迟任务】
+            requestAnimationFrame(() => requestAnimationFrame(() => scrollNow()));
+            [80, 240, 650].forEach(delay => setTimeout(() => scrollNow(), delay));
+            if (latestUserMessage) {
+                latestUserMessage.querySelectorAll('img').forEach(img => {
+                    if (!img.complete) img.addEventListener('load', () => scrollNow(), { once: true });
+                });
+                // 【本次修改：观察新消息短时间内的高度变化；仅校准未被用户手动移动的位置】
+                if (typeof ResizeObserver !== 'undefined') {
+                    const messageResizeObserver = new ResizeObserver(() => scrollNow());
+                    messageResizeObserver.observe(latestUserMessage);
+                    setTimeout(() => messageResizeObserver.disconnect(), 2000);
+                }
+            }
+        }
+
         function isNearChatBottom() { return chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 44; }
         function updateJumpLatestButton() { const show = isViewingHistory && !isNearChatBottom(); jumpLatestBtn.classList.toggle('visible', show); }
         chatArea.addEventListener('scroll', () => { isViewingHistory = !isNearChatBottom(); updateJumpLatestButton(); }, { passive: true });
@@ -6685,7 +6873,7 @@
         // 1. 点击 Call 后先进入“正在拨号中”
         // 2. 【本次修改】接通等待时间改为随机 0 秒-1 分钟
         // 3. 【本次修改】接通后按指定陪伴站模式：每轮随机等待 30 秒-1 分钟
-        // 4. 【本次修改】每轮随机连续显示 1-10 条字卡，同轮每条间隔 6500ms
+        // 4. 【本次修改】每轮随机连续显示 1-7 条字卡，同轮每条间隔 6500ms
         // 5. 字卡共用当前好友 settings.phrases
         // 6. 开始通话时清空并作废该好友旧普通聊天任务
         // 7. 挂断后仅重新安排新的主动发送，不恢复旧任务
@@ -6785,11 +6973,11 @@
             simCallBatchTimers.push(fadeTimer, clearTimer);
         }
 
-        // 【本次修改：每轮随机1-10条，第一条在轮次触发时立即显示，后续按6500ms顺序显示】
+        // 【本次修改：每轮随机1-7条，第一条在轮次触发时立即显示，后续按6500ms顺序显示】
         function simCallPlayPhraseRound() {
             if (!simCallActive || !simCallConnected) return 0;
 
-            const messageCount = Math.floor(Math.random() * 10) + 1; // 【本次修改：通话每轮 1-10 条】
+            const messageCount = Math.floor(Math.random() * 7) + 1; // 【本次修改：通话每轮随机 1-7 条】
             simCallBatchTimers.forEach(timer => clearTimeout(timer));
             simCallBatchTimers = [];
             simCallPrepareRecordSlots(messageCount);
@@ -6824,7 +7012,7 @@
 
                 const roundDuration = simCallPlayPhraseRound();
 
-                // 【本次修改：避免下一轮计时与当前1-10条字幕播放重叠】
+                // 【本次修改：避免下一轮计时与当前1-7条字幕播放重叠】
                 const nextRoundTimer = setTimeout(() => {
                     if (!simCallActive || !simCallConnected) return;
                     simCallScheduleNextRound();
