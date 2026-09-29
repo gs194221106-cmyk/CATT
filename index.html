@@ -439,8 +439,8 @@
         }
 
         .chat-area {
-            /* 【本次修改：聊天头像整体放大；左右间距保持原值】 */
-            --message-avatar-size: 38px;
+            /* 【本次修改：恢复原版聊天头像尺寸，只保留消息间距调整】 */
+            --message-avatar-size: 32px;
             --message-avatar-gap: 10px;
         }
 
@@ -474,12 +474,12 @@
             position: relative;
             animation: fadeIn 0.3s ease;
 
-            /* 【本次修改：配合放大的消息头像，适度放大普通消息文字】 */
-            font-size: 14px;
-            line-height: 1.4;
+            /* 【本次修改：恢复原版聊天气泡字号与行高】 */
+            font-size: 12.5px;
+            line-height: 1.35;
 
-            /* 【本次修改：气泡可用宽度按放大后的消息头像准确计算】 */
-            max-width: calc(100% - var(--message-avatar-size) - var(--message-avatar-gap));
+            /* 【本次修改：恢复原版聊天气泡宽度计算】 */
+            max-width: calc(100% - var(--avatar-size) - var(--avatar-gap));
             white-space: pre-wrap;
             word-break: break-word;
         }
@@ -2338,10 +2338,10 @@
             max-width: 100%;
             padding: 8px 12px;
             border-radius: 14px;
-            /* 【本次修改：正文气泡字体与普通文本消息统一放大】 */
-            font-size: 14px;
+            /* 【本次修改：恢复原版正文气泡字号与行高】 */
+            font-size: 12.5px;
             color: var(--wechat-text);
-            line-height: 1.4;
+            line-height: 1.35;
             white-space: pre-wrap;
             word-break: break-word;
         }
