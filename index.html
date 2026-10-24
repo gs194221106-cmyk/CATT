@@ -4151,23 +4151,28 @@
           <div class="voice-panel-content">
             <div class="voice-panel-section">
               <h3>导入语音</h3>
-              <div class="voice-muted">选择一个 ZIP 压缩包，或直接选择一条／多条 MP3。首次数量一致时可自动按序匹配；以后只绑定本次选择的中文字卡。</div>
+              <!-- 【本次修复：允许同一批选择多个 ZIP、多个 MP3，或混合选择；以实际 MP3 数量选卡】 -->
+              <div class="voice-muted">可一次选择多个 ZIP 压缩包或 MP3（也可混合选择）。将按文件名自然顺序排序，默认匹配当前未绑定字卡中的前 N 张，N 为本次读取的 MP3 数量；导入前可检查、调整。</div>
               <input type="file" id="voiceFileInput" accept=".zip,.mp3,audio/mpeg,application/zip" multiple class="voice-field">
               <div class="voice-inline-note" id="voiceImportStatus" aria-live="polite"></div>
               <div id="voiceScope" hidden>
                 <div class="voice-scope-title" id="voiceScopeSummary"></div>
-                <div class="voice-actions"><button type="button" class="voice-minor-btn" id="voiceSelectAllUnbound">选择全部未绑定字卡</button><button type="button" class="voice-minor-btn" id="voiceClearScope">清空选择</button></div>
+                <!-- 【本次修复：不再误选 1090 张全部字卡；按钮严格按照本次 MP3 条数选前 N 张未绑定字卡】 -->
+                <div class="voice-actions"><button type="button" class="voice-minor-btn" id="voiceSelectAllUnbound">按 MP3 数量自动选卡</button><button type="button" class="voice-minor-btn" id="voiceClearScope">清空选择</button></div>
                 <input type="search" class="voice-field" id="voiceScopeFilter" placeholder="搜索本次要绑定的中文字卡">
                 <div class="voice-muted" id="voiceScopeCount"></div>
                 <div class="voice-scope-list" id="voiceScopeList"></div>
-                <div class="voice-muted">勾选数量必须与 MP3 数量一致。仅影响你本次勾选的字卡。</div>
+                <!-- 【本次修复：上千张字卡按需显示，搜索结果及后续字卡也可以逐步查看】 -->
+                <button type="button" class="voice-minor-btn" id="voiceScopeMore" hidden style="margin-top:8px">查看更多字卡</button>
+                <div class="voice-muted" id="voiceScopeHint">只修改本次勾选字卡的绑定；未选的字卡不会受到影响。</div>
               </div>
+              <!-- 【本次修复：确认按钮放在预览列表之前，避免手机上需要滚动几十条 MP3 才能找到】 -->
+              <div class="voice-actions" id="voiceImportActions" hidden><button type="button" class="voice-small-btn" id="voiceCommitBtn" disabled>确认并导入这些语音</button></div>
               <div id="voiceImportPreview" hidden>
                 <div class="voice-scope-title">匹配预览（可逐条试听、调整绑定）</div>
                 <input type="search" class="voice-field" id="voicePreviewFilter" placeholder="搜索 MP3 文件名或当前匹配的中文字卡">
                 <div id="voicePreviewList" style="margin-top:9px"></div>
                 <button type="button" class="voice-minor-btn" id="voiceMorePreview" hidden>查看更多匹配</button>
-                <div class="voice-actions"><button type="button" class="voice-small-btn" id="voiceCommitBtn">确认并导入这些语音</button></div>
               </div>
             </div>
             <div class="voice-panel-section" id="voiceSearchPanel" hidden>
@@ -4376,6 +4381,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         let voiceDraftSelectedIds = new Set();
         let voiceDraftPositions = [];
         let voiceDraftInitial = false;
+        // 【本次修复：范围选择支持分批查看；选卡数量不受可见行数限制】
+        let voiceScopeVisibleCount = 65;
         let voiceLibraryVisibleCount = 45;
         let voicePreviewVisibleCount = 40;
         let voiceActiveTrackId = null;
@@ -4523,7 +4530,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             el.style.color = warn ? '#a33e3e' : '#777';
         }
         function voiceNaturalSort(a, b) {
-            return a.name.localeCompare(b.name, 'zh-CN', { numeric: true, sensitivity: 'base' });
+            // 【本次修复：预导入文件使用 name，已保存语音元数据使用 filename；统一排序避免导入多条后列表报错】
+            const nameA = a.name || a.filename || '';
+            const nameB = b.name || b.filename || '';
+            return nameA.localeCompare(nameB, 'zh-CN', { numeric: true, sensitivity: 'base' });
         }
         function voiceStopPreview() {
             voicePreviewGeneration++;
@@ -4566,6 +4576,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             voiceTargetMode = null; voiceEl('voiceSearchPanel').hidden = true;
             voiceEl('voiceImportPreview').hidden = true;
             voiceEl('voiceScope').hidden = true;
+            voiceEl('voiceImportActions').hidden = true; // 【本次修复：关闭时清理导入确认区】
             voiceEl('voicePanel').classList.remove('active');
             voiceEl('voiceFileInput').value = '';
         }
@@ -4609,79 +4620,131 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             voiceEl('voiceActiveName').textContent = item.filename;
             voiceEl('voiceActiveBinding').textContent = item.phraseId ? `已绑定：${voicePhraseText(item.phraseId)}` : '未绑定';
         }
-        // 【本次新增】ZIP 按文件名中的数字自然排序；不依赖 Finder 显示顺序。
+        // 【本次修复：可同时导入多个 ZIP / 单独 MP3；自动选择前 N 张未绑定中文字卡】
+        // N = 全部所选压缩包中 MP3 总条数 + 直接选择的 MP3 条数。
+        // 只读取文件索引作匹配预览，用户确认后再逐条解压并写入 IndexedDB。
         async function voiceChooseFiles(files) {
             if (voiceImportBusy || !files.length) return;
             voiceDraftFiles = []; voiceDraftPositions = []; voiceDraftSelectedIds.clear();
+            voiceScopeVisibleCount = 65;
             voiceEl('voiceImportPreview').hidden = true;
+            voiceEl('voiceImportActions').hidden = true;
             voiceEl('voiceScope').hidden = true;
+            voiceEl('voiceScopeFilter').value = '';
             voiceEl('voicePreviewFilter').value = '';
             voiceStatus('正在读取文件列表……');
             try {
                 const inputs = [...files];
-                if (inputs.length === 1 && /\.zip$/i.test(inputs[0].name)) {
-                    if (typeof JSZip === 'undefined') throw new Error('ZIP 解压组件尚未加载');
-                    const zip = await JSZip.loadAsync(inputs[0]);
-                    for (const entry of Object.values(zip.files)) {
-                        if (entry.dir || !/\.mp3$/i.test(entry.name) || entry.name.includes('__MACOSX/')) continue;
-                        const label = entry.name.split('/').pop();
-                        voiceDraftFiles.push({ name: label, getBlob: () => entry.async('blob') });
+                let zipCount = 0, singleCount = 0;
+                for (const input of inputs) {
+                    if (/\.zip$/i.test(input.name)) {
+                        zipCount++;
+                        if (typeof JSZip === 'undefined') throw new Error('ZIP 解压组件尚未加载');
+                        const zip = await JSZip.loadAsync(input);
+                        for (const entry of Object.values(zip.files)) {
+                            if (entry.dir || !/\.mp3$/i.test(entry.name) || entry.name.includes('__MACOSX/')) continue;
+                            const label = entry.name.split('/').pop();
+                            voiceDraftFiles.push({ name: label, getBlob: () => entry.async('blob') });
+                        }
+                    } else if (/\.mp3$/i.test(input.name)) {
+                        singleCount++;
+                        voiceDraftFiles.push({ name: input.name, getBlob: async () => input });
+                    } else {
+                        throw new Error(`不支持的文件：${input.name}；请选择 ZIP 或 MP3`);
                     }
-                } else {
-                    if (inputs.some(f => !/\.mp3$/i.test(f.name))) throw new Error('请一次选择一个 ZIP，或者直接选择多个 MP3');
-                    voiceDraftFiles = inputs.map(file => ({ name: file.name, getBlob: async () => file }));
                 }
                 voiceDraftFiles.sort(voiceNaturalSort);
-                if (!voiceDraftFiles.length) throw new Error('未找到 MP3 文件');
+                if (!voiceDraftFiles.length) throw new Error('所选文件中没有找到 MP3');
                 const seen = new Set();
-                const duplicates = voiceDraftFiles.filter(v => { const key = v.name.toLowerCase(); if (seen.has(key)) return true; seen.add(key); return false; });
-                if (duplicates.length) throw new Error(`压缩包存在 ${duplicates.length} 个重名 MP3，避免覆盖请先整理 ZIP`);
+                const duplicates = voiceDraftFiles.filter(v => {
+                    const key = v.name.toLowerCase();
+                    if (seen.has(key)) return true;
+                    seen.add(key); return false;
+                });
+                if (duplicates.length) throw new Error(`多个 ZIP/MP3 中出现 ${duplicates.length} 个重名 MP3（例如 ${duplicates[0].name}），请先处理重名文件，避免音频错位`);
+
                 const friend = getCurrentFriend();
-                const unbound = friend.settings.phraseIds.filter(id => !voiceRows.some(v => v.phraseId === id));
-                voiceDraftInitial = voiceRows.length === 0 && voiceDraftFiles.length === friend.settings.phrases.length;
-                if (voiceDraftInitial) voiceDraftSelectedIds = new Set(friend.settings.phraseIds);
+                const taken = new Set(voiceRows.map(v => v.phraseId).filter(Boolean));
+                const unbound = friend.settings.phraseIds.filter(id => !taken.has(id));
+                // 【本次修复：400 个 MP3 + 1090 张字卡 => 自动选择前 400 张，而不是 1090 张或 0 张】
+                const selected = unbound.slice(0, voiceDraftFiles.length);
+                voiceDraftSelectedIds = new Set(selected);
+                voiceDraftInitial = voiceRows.length === 0;
                 voiceEl('voiceScope').hidden = false;
-                voiceEl('voiceScopeSummary').textContent = `已读取 ${voiceDraftFiles.length} 个 MP3；${voiceDraftInitial ? '数量与当前全部字卡一致，已自动选择全部字卡。' : '请选择本次需要绑定的未绑定字卡（不会改动其他已绑定字卡）。'}`;
+                voiceEl('voiceImportActions').hidden = false;
+                const summary = [`${zipCount} 个 ZIP`, `${singleCount} 个单独 MP3`].filter(s => !s.startsWith('0 ')).join(' + ');
+                voiceEl('voiceScopeSummary').textContent = `已读取 ${voiceDraftFiles.length} 个 MP3（${summary}）；当前共 ${friend.settings.phrases.length} 张字卡，其中 ${unbound.length} 张未绑定。已按字卡原始顺序自动选择前 ${selected.length} 张未绑定字卡。`;
                 let warning = '';
-                const numberEnds = voiceDraftFiles.map(f => { const m = f.name.match(/(\d+)(?=\.mp3$)/i); return m ? Number(m[1]) : NaN; });
-                if (numberEnds.every(Number.isFinite) && numberEnds.length > 1) {
-                    const gaps = numberEnds.slice(1).filter((num, i) => num - numberEnds[i] !== 1);
-                    if (gaps.length) warning = `注意：文件尾号不完全连续（${gaps.length} 处），请核对排序后再确认。`;
+                if (unbound.length < voiceDraftFiles.length) {
+                    warning = `本次 ${voiceDraftFiles.length} 条 MP3，但只有 ${unbound.length} 张未绑定字卡；请补充字卡或减少导入文件。`;
+                } else {
+                    const numberEnds = voiceDraftFiles.map(f => {
+                        const m = f.name.match(/(\d+)(?=\.mp3$)/i);
+                        return m ? Number(m[1]) : NaN;
+                    });
+                    if (numberEnds.every(Number.isFinite) && numberEnds.length > 1) {
+                        const gaps = numberEnds.slice(1).filter((num, i) => num - numberEnds[i] !== 1);
+                        if (gaps.length) warning = `文件尾号有 ${gaps.length} 处不连续；请核对匹配预览后再导入。`;
+                    }
                 }
-                voiceStatus(warning || `已读取 ${voiceDraftFiles.length} 条语音，导入前可检查并调整对应关系。`, !!warning);
+                voiceStatus(warning || `已匹配 ${selected.length} 张字卡，可在下方抽样试听，确认后导入。`, !!warning);
                 voiceRenderScope(); voicePrepareDraft();
             } catch (err) {
                 console.error(err); voiceStatus(`无法读取：${err.message}`, true);
-                voiceDraftFiles = [];
+                voiceDraftFiles = []; voiceDraftSelectedIds.clear();
+                voiceEl('voiceScope').hidden = true;
+                voiceEl('voiceImportActions').hidden = true;
+                voiceEl('voiceImportPreview').hidden = true;
                 voiceEl('voiceFileInput').value = '';
             }
+        }
+        function voiceAutoSelectByFileCount() {
+            // 【本次修复】保留原字卡顺序，只选择前 N 张尚未绑定的字卡。
+            const friend = getCurrentFriend();
+            const occupied = new Set(voiceRows.map(v => v.phraseId).filter(Boolean));
+            const unbound = friend.settings.phraseIds.filter(id => !occupied.has(id));
+            voiceDraftSelectedIds = new Set(unbound.slice(0, voiceDraftFiles.length));
+            voiceRenderScope(); voicePrepareDraft();
         }
         function voiceRenderScope() {
             const friend = getCurrentFriend();
             const filter = voiceEl('voiceScopeFilter').value.trim();
             const rows = [];
-            friend.settings.phrases.forEach((text, i) => {
+            const occupied = new Set(voiceRows.map(v => v.phraseId).filter(Boolean));
+            friend.settings.phrases.forEach((phrase, i) => {
                 const id = friend.settings.phraseIds[i];
-                if (filter && !text.includes(filter)) return;
-                const occupied = voiceRows.some(v => v.phraseId === id);
-                rows.push({ text, id, occupied });
+                if (filter && !phrase.includes(filter)) return;
+                rows.push({ text: phrase, id, occupied: occupied.has(id) });
             });
             const container = voiceEl('voiceScopeList'); container.innerHTML = '';
-            rows.slice(0, 65).forEach(item => {
+            rows.slice(0, voiceScopeVisibleCount).forEach(item => {
                 const label = document.createElement('label'); label.className = 'voice-scope-option';
                 const check = document.createElement('input'); check.type = 'checkbox'; check.checked = voiceDraftSelectedIds.has(item.id); check.disabled = item.occupied;
                 const text = document.createElement('span'); text.textContent = item.text;
-                check.addEventListener('change', () => { if (check.checked) voiceDraftSelectedIds.add(item.id); else voiceDraftSelectedIds.delete(item.id); voicePrepareDraft(); });
+                check.addEventListener('change', () => {
+                    if (check.checked) voiceDraftSelectedIds.add(item.id);
+                    else voiceDraftSelectedIds.delete(item.id);
+                    voicePrepareDraft();
+                });
                 label.append(check, text); container.appendChild(label);
             });
-            voiceEl('voiceScopeCount').textContent = `本次已选择 ${voiceDraftSelectedIds.size} 张字卡 / ${voiceDraftFiles.length} 个 MP3`;
+            // 【本次修复】不能因为只渲染前 65 条就误认为只有 65 张字卡。
+            voiceEl('voiceScopeMore').hidden = rows.length <= voiceScopeVisibleCount;
+            voiceEl('voiceScopeMore').textContent = `查看更多字卡（当前显示 ${Math.min(rows.length, voiceScopeVisibleCount)} / ${rows.length}）`;
         }
         function voicePrepareDraft() {
             const ordered = getCurrentFriend().settings.phraseIds.filter(id => voiceDraftSelectedIds.has(id));
-            voiceEl('voiceScopeCount').textContent = `本次已选择 ${ordered.length} 张字卡 / ${voiceDraftFiles.length} 个 MP3`;
-            voiceEl('voiceImportPreview').hidden = ordered.length !== voiceDraftFiles.length || !ordered.length;
-            if (voiceEl('voiceImportPreview').hidden) { voiceDraftPositions = []; return; }
-            // 选卡集合改变后重新根据选中的中文字卡顺序生成匹配草稿，不立即写入数据库。
+            const ready = ordered.length > 0 && ordered.length === voiceDraftFiles.length;
+            voiceEl('voiceScopeCount').textContent = `本次选择 ${ordered.length} 张字卡 / ${voiceDraftFiles.length} 个 MP3（全部字卡 ${getCurrentFriend().settings.phrases.length} 张）`;
+            voiceEl('voiceImportActions').hidden = !voiceDraftFiles.length;
+            voiceEl('voiceImportPreview').hidden = !ready;
+            voiceEl('voiceCommitBtn').disabled = !ready;
+            voiceEl('voiceCommitBtn').textContent = ready ? `确认导入 ${voiceDraftFiles.length} 条语音` : '请先调整所选字卡数量';
+            voiceEl('voiceScopeHint').textContent = ready
+                ? `已匹配 ${ordered.length} 张字卡。下方可试听与调整；确认后只会保存这 ${ordered.length} 条绑定。`
+                : `需选择 ${voiceDraftFiles.length} 张字卡，目前选择 ${ordered.length} 张；数量相同后即可确认导入。`;
+            if (!ready) { voiceDraftPositions = []; return; }
+            // 【本次修复】选卡变化后用中文字卡原始顺序生成预览，不更改字卡本身。
             voiceDraftPositions = ordered.map((_, i) => i);
             voicePreviewVisibleCount = 40;
             voiceRenderDraftPreview();
@@ -4810,6 +4873,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                 voiceStatus(`已完成导入 ${done} 条语音。`);
                 voiceDraftFiles = []; voiceDraftPositions = []; voiceDraftSelectedIds.clear();
                 voiceEl('voiceScope').hidden = true; voiceEl('voiceImportPreview').hidden = true;
+                voiceEl('voiceImportActions').hidden = true; // 【本次修复：导入完成后收起确认区】
                 voiceEl('voiceFileInput').value = '';
                 await voiceRefreshRows();
             } catch (err) {
@@ -4834,12 +4898,10 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         voiceEl('voiceOpenBtn').addEventListener('click', voiceOpenPanel);
         voiceEl('voiceCloseBtn').addEventListener('click', voiceClosePanel);
         voiceEl('voiceFileInput').addEventListener('change', e => voiceChooseFiles(e.target.files));
-        voiceEl('voiceScopeFilter').addEventListener('input', voiceRenderScope);
-        voiceEl('voiceSelectAllUnbound').addEventListener('click', () => {
-            const f = getCurrentFriend();
-            voiceDraftSelectedIds = new Set(f.settings.phraseIds.filter(id => !voiceRows.some(r => r.phraseId === id)));
-            voiceRenderScope(); voicePrepareDraft();
-        });
+        voiceEl('voiceScopeFilter').addEventListener('input', () => { voiceScopeVisibleCount = 65; voiceRenderScope(); });
+        // 【本次修复：自动选卡只选本次 MP3 数量；可逐步查看更多，不影响全量计数】
+        voiceEl('voiceSelectAllUnbound').addEventListener('click', voiceAutoSelectByFileCount);
+        voiceEl('voiceScopeMore').addEventListener('click', () => { voiceScopeVisibleCount += 65; voiceRenderScope(); });
         voiceEl('voiceClearScope').addEventListener('click', () => {
             voiceDraftSelectedIds.clear(); voiceRenderScope(); voicePrepareDraft();
         });
@@ -4881,17 +4943,50 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                 return await voiceAudioContext.decodeAudioData(buffer);
             } catch (err) { console.warn('语音读取或解码失败，保留原字卡显示：', err); return null; }
         }
+        // 【本次修改：通话音频时长自适应】只有确实播完 MP3 才结束本条的音频等待；返回 true 表示实际播放完成。
+        // 原来开始播放后马上返回，下一条字幕仍固定在 6.5 秒出现，可能截断长音频。
         async function voicePlayCallAudio(friendId, phraseId, expectedGeneration) {
             const decoded = await voicePrepareCallAudio(friendId, phraseId);
-            if (!decoded || !simCallActive || !simCallConnected || simCallFriendId !== friendId || expectedGeneration !== voicePlayGeneration) return;
+            if (!decoded || !simCallActive || !simCallConnected || simCallFriendId !== friendId || expectedGeneration !== voicePlayGeneration) return false;
             try {
-                await voiceAudioContext.resume();
-                if (!simCallActive || expectedGeneration !== voicePlayGeneration) return;
+                // 【本次修改】防止浏览器禁止自动播放时 resume 一直等待，影响后续字幕。
+                let resumeTimeout = null;
+                const resumed = await Promise.race([
+                    voiceAudioContext.resume().then(() => true).catch(() => false),
+                    new Promise(resolve => { resumeTimeout = setTimeout(() => resolve(false), 3500); })
+                ]);
+                clearTimeout(resumeTimeout); // 【本次修改】音频已启用后移除超时计时器，不残留额外任务。
+                if (!resumed || voiceAudioContext.state !== 'running') return false;
+                if (!simCallActive || !simCallConnected || simCallFriendId !== friendId || expectedGeneration !== voicePlayGeneration) return false;
                 const src = voiceAudioContext.createBufferSource();
-                src.buffer = decoded; src.connect(voiceAudioContext.destination);
-                src.onended = () => { if (voiceAudioSource === src) voiceAudioSource = null; };
-                voiceAudioSource = src; src.start(0);
-            } catch (err) { console.warn('通话语音无法播放：', err); }
+                src.buffer = decoded;
+                src.connect(voiceAudioContext.destination);
+                voiceAudioSource = src;
+                // 【本次修改】直接等待 WebAudio 的 onended，而不是猜测文字播报需要几秒。
+                return await new Promise(resolve => {
+                    let settled = false;
+                    let timeout = null;
+                    const finish = played => {
+                        if (settled) return;
+                        settled = true;
+                        clearTimeout(timeout);
+                        if (voiceAudioSource === src) voiceAudioSource = null;
+                        resolve(played);
+                    };
+                    src.onended = () => finish(true);
+                    try {
+                        src.start(0);
+                        // 【本次修改】音频上下文异常暂停时兜底，不让通话永久卡在一条字幕。
+                        timeout = setTimeout(() => {
+                            try { src.stop(); } catch (_) { }
+                            finish(false);
+                        }, Math.ceil(decoded.duration * 1000) + 5000);
+                    } catch (err) {
+                        console.warn('通话 MP3 启动失败：', err);
+                        finish(false);
+                    }
+                });
+            } catch (err) { console.warn('通话语音无法播放：', err); return false; }
         }
         // ========== 【本次新增：CATT 角色语音库】结束 ==========
 
@@ -7830,7 +7925,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         // 1. 点击 Call 后先进入“正在拨号中”
         // 2. 【本次修改】接通等待时间改为随机 0 秒-1 分钟
         // 3. 【本次修改】接通后按指定陪伴站模式：每轮随机等待 30 秒-1 分钟
-        // 4. 【本次修改】每轮随机连续显示 1-7 条字卡，同轮每条间隔 6500ms
+        // 4. 【本次修改：音频时长自适应】每轮 1-7 条；每条 MP3 播完并留白后才开始下一条
         // 5. 字卡共用当前好友 settings.phrases
         // 6. 开始通话时清空并作废该好友旧普通聊天任务
         // 7. 挂断后仅重新安排新的主动发送，不恢复旧任务
@@ -7898,21 +7993,43 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             }
         }
 
-        // 【本次修改：字幕从上到下显示两条；第3、4、5条循环回第1、第2个位置】
-        function simCallShowPhrase(phrase, slotIndex) {
-            if (!simCallActive || !simCallConnected || !phrase) return;
-            // 【本次新增：通话字幕继续显示原中文字卡，语音按 ID 异步读取；无绑定时仍照常显示字幕】
+        // 【本次修改：音频时长自适应】当前通话专用的等待控制器；挂断即可取消所有字幕等待。
+        let simCallAdaptiveController = null;
+        const SIM_CALL_MIN_SUBTITLE_MS = 9000; // 【本次修改】短音频/无语音时，单条字幕至少显示 9 秒
+        const SIM_CALL_AUDIO_PAUSE_MS = 1800;  // 【本次修改】音频播放结束后额外停顿 1.8 秒
+        const SIM_CALL_FADE_MS = 500;         // 【本次修改】沿用原版 0.5 秒淡出效果
+
+        // 【本次修改：音频时长自适应】支持挂断取消，不残留下一条的计时任务。
+        function simCallAdaptiveWait(ms, signal) {
+            return new Promise(resolve => {
+                if (signal.aborted) return resolve(false);
+                let settled = false;
+                let timer;
+                const finish = completed => {
+                    if (settled) return;
+                    settled = true;
+                    clearTimeout(timer);
+                    signal.removeEventListener('abort', onAbort);
+                    resolve(completed);
+                };
+                const onAbort = () => finish(false);
+                signal.addEventListener('abort', onAbort, { once: true });
+                timer = setTimeout(() => finish(true), Math.max(0, ms));
+            });
+        }
+
+        // 【本次修改：音频时长自适应】显示字幕后等待实际 MP3 播放完毕；无 MP3 仍保留足够阅读时间。
+        async function simCallShowPhrase(phrase, slotIndex, signal) {
+            if (!simCallActive || !simCallConnected || !phrase || signal.aborted) return false;
             const text = typeof phrase === 'string' ? phrase : phrase.text;
             const phraseId = typeof phrase === 'string' ? null : phrase.phraseId;
             const callFriendId = simCallFriendId;
             voiceStopCallAudio();
             const expectedGeneration = voicePlayGeneration;
-            if (phraseId) voicePlayCallAudio(callFriendId, phraseId, expectedGeneration);
-
             const slots = simCallMessageWrap.querySelectorAll('.sim-call-record-slot');
-            if (!slots.length) return;
+            if (!slots.length) return false;
             const slot = slots[slotIndex % slots.length];
-            if (!slot) return;
+            if (!slot) return false;
 
             const item = document.createElement('div');
             item.className = 'sim-call-record-item';
@@ -7920,76 +8037,63 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             slot.innerHTML = '';
             slot.appendChild(item);
             simCallOverlay.classList.add('speaking');
-
+            const displayedAt = Date.now();
             requestAnimationFrame(() => item.classList.add('visible'));
 
-            // 沿用陪伴站节奏：显示6000ms，再用约500ms淡出；下一条在6500ms时出现。
-            const fadeTimer = setTimeout(() => {
-                if (!simCallActive) return;
-                item.classList.remove('visible');
-                item.classList.add('leaving');
-                simCallOverlay.classList.remove('speaking');
-            }, 6000);
+            // 【本次修改】先等待当前 MP3 真正结束，不让下一条字幕提前截断它。
+            const played = phraseId ? await voicePlayCallAudio(callFriendId, phraseId, expectedGeneration) : false;
+            if (signal.aborted || !simCallActive || !simCallConnected || simCallFriendId !== callFriendId || expectedGeneration !== voicePlayGeneration) return false;
 
-            const clearTimer = setTimeout(() => {
-                if (item.parentNode === slot) slot.innerHTML = '';
-            }, 6500);
+            // 【本次修改】无语音时至少 9 秒；有语音时至少 9 秒且播完后另留 1.8 秒。
+            const elapsed = Date.now() - displayedAt;
+            const remaining = Math.max(0, SIM_CALL_MIN_SUBTITLE_MS - elapsed, played ? SIM_CALL_AUDIO_PAUSE_MS : 0);
+            if (!await simCallAdaptiveWait(remaining, signal)) return false;
+            if (!simCallActive || !simCallConnected || simCallFriendId !== callFriendId) return false;
 
-            simCallBatchTimers.push(fadeTimer, clearTimer);
+            item.classList.remove('visible');
+            item.classList.add('leaving');
+            simCallOverlay.classList.remove('speaking');
+            if (!await simCallAdaptiveWait(SIM_CALL_FADE_MS, signal)) return false;
+            if (item.parentNode === slot) slot.innerHTML = '';
+            return !signal.aborted && simCallActive && simCallConnected && simCallFriendId === callFriendId;
         }
 
-        // 【本次修改：每轮随机1-7条，第一条在轮次触发时立即显示，后续按6500ms顺序显示】
-        function simCallPlayPhraseRound() {
-            if (!simCallActive || !simCallConnected) return 0;
-
-            const messageCount = Math.floor(Math.random() * 7) + 1; // 【本次修改：通话每轮随机 1-7 条】
+        // 【本次修改：音频时长自适应】本轮改为逐条等待完成，不再用 i*6500ms 同时安排后续字幕。
+        async function simCallPlayPhraseRound(signal) {
+            if (!simCallActive || !simCallConnected || signal.aborted) return;
+            const messageCount = Math.floor(Math.random() * 7) + 1; // 保持原来的每轮随机 1-7 条
             simCallBatchTimers.forEach(timer => clearTimeout(timer));
             simCallBatchTimers = [];
             simCallPrepareRecordSlots(messageCount);
 
-            // 【本次修改：首条不再套 setTimeout(0)，避免首轮触发后字幕未真正执行】
-            const firstPhrase = simCallPickPhrase();
-            if (firstPhrase) {
-                simCallShowPhrase(firstPhrase, 0);
+            // 第一条仍然在本轮开始时立即显示；其余逐条等待真实音频结束。
+            for (let i = 0; i < messageCount; i++) {
+                if (signal.aborted || !simCallActive || !simCallConnected) return;
+                const phrase = simCallPickPhrase();
+                if (!phrase) return;
+                if (!await simCallShowPhrase(phrase, i, signal)) return;
             }
-
-            for (let i = 1; i < messageCount; i++) {
-                const timer = setTimeout(() => {
-                    if (!simCallActive || !simCallConnected) return;
-                    const phrase = simCallPickPhrase();
-                    if (phrase) simCallShowPhrase(phrase, i);
-                }, i * 6500);
-
-                simCallBatchTimers.push(timer);
-            }
-
-            // 返回本轮完整播放时长，供下一轮在本轮结束后再重新计时
-            return messageCount * 6500;
         }
 
-        // 【本次修改：先等待30秒-1分钟；本轮全部结束后，再重新计算下一轮30秒-1分钟】
+        // 【本次修改：音频时长自适应】整轮 1-7 条字幕全部播完，才开始下一轮随机 30-60 秒等待。
         function simCallScheduleNextRound() {
-            if (!simCallActive || !simCallConnected) return;
-
+            if (!simCallActive || !simCallConnected || !simCallAdaptiveController) return;
+            const signal = simCallAdaptiveController.signal;
             clearTimeout(simCallPhraseTimer);
-            simCallPhraseTimer = setTimeout(() => {
-                if (!simCallActive || !simCallConnected) return;
-
-                const roundDuration = simCallPlayPhraseRound();
-
-                // 【本次修改：避免下一轮计时与当前1-7条字幕播放重叠】
-                const nextRoundTimer = setTimeout(() => {
-                    if (!simCallActive || !simCallConnected) return;
-                    simCallScheduleNextRound();
-                }, roundDuration);
-
-                simCallBatchTimers.push(nextRoundTimer);
+            simCallPhraseTimer = setTimeout(async () => {
+                if (signal.aborted || !simCallActive || !simCallConnected) return;
+                await simCallPlayPhraseRound(signal);
+                if (signal.aborted || !simCallActive || !simCallConnected) return;
+                simCallScheduleNextRound();
             }, simCallRoundDelay());
         }
 
         function simCallConnect() {
             if (!simCallActive) return;
 
+            // 【本次修改：音频时长自适应】每次接通创建独立控制器，防止上一次通话的任务混入。
+            if (simCallAdaptiveController) simCallAdaptiveController.abort();
+            simCallAdaptiveController = new AbortController();
             simCallConnected = true;
             clearInterval(simCallDialClockTimer); // 【本次修改：接通后停止拨号等待计时】
             simCallDialClockTimer = null;
@@ -8067,6 +8171,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         function endSimulatedCall() {
             if (!simCallActive) return;
 
+            // 【本次修改：音频时长自适应】挂断时取消所有逐条等待与未来字幕任务。
+            if (simCallAdaptiveController) { simCallAdaptiveController.abort(); simCallAdaptiveController = null; }
             const endedFriendId = simCallFriendId;
             const callWasConnected = simCallConnected; // 【本次修改：用于区分“通话结束”与“取消通话”】
             // 【本次新增：挂断时停止正在播放及等待解码的语音】
