@@ -5863,7 +5863,8 @@
             chatArea.appendChild(node);
 
             /* 【本次修改：所有追加消息统一交由单一滚动函数处理，避免重复校准互相竞争】 */
-            if (shouldFollowLatest) scrollChatToLatest(currentFriend.id, messageElement);
+            // 【本次修复：只有用户亲自发送才开启“必须跟随最新”；角色消息继续遵守历史浏览保护】
+            if (shouldFollowLatest) scrollChatToLatest(currentFriend.id, messageElement, forceFollowLatest && msg.sender === 'user');
             else updateJumpLatestButton();
         }
 
@@ -6804,16 +6805,26 @@
         // =========================================================
         /* 【本次修复：合并滚动管理；取消旧 RAF/观察器/定时器，避免设置/切换角色后的旧回调再拉动列表】 */
         let activeChatScrollCleanup = null;
-        function scrollChatToLatest(friendId, observedMessage = null) {
+        // 【本次修复：用户发消息后的补偿滚动不受“正在浏览历史”误判影响，角色消息无变化】
+        let userSendScrollFollowing = false;
+        function scrollChatToLatest(friendId, observedMessage = null, forceUserSend = false) {
             if (activeChatScrollCleanup) activeChatScrollCleanup();
+            userSendScrollFollowing = forceUserSend;
             let cancelled = false;
             let raf1 = 0, raf2 = 0, cleanupTimer = null, resizeObserver = null;
-            const stopFollowing = () => { cancelled = true; };
+            // 【本次修复：iOS PWA 后台恢复/键盘弹出后可能延迟恢复聊天区尺寸；仅用户发送时额外监听尺寸恢复】
+            const retryUserScrollOnLayout = () => {
+                if (!forceUserSend || cancelled || document.hidden) return;
+                scrollNow();
+                requestAnimationFrame(scrollNow);
+            };
+            // 【本次修复：如用户发完消息后手动触摸列表，立即结束强制跟随，允许重新浏览历史】
+            const stopFollowing = () => { cancelled = true; if (forceUserSend) cleanup(); };
             const scrollNow = () => {
                 const activeFriend = getCurrentFriend();
                 if (cancelled || !activeFriend || activeFriend.id !== friendId) return;
-                // 【本次修复：用户已回到浏览历史状态时，旧异步尺寸校准不得再把消息拉回底部】
-                if (isViewingHistory) { cleanup(); return; }
+                // 【本次修复：角色/普通旧回调仍保护历史；用户发送由本次明确操作要求滚到底，不被误判取消】
+                if (!forceUserSend && isViewingHistory) { cleanup(); return; }
                 if (!chatArea.clientHeight) return; // 【本次修复：界面未完成布局时不进行无效滚动】
                 chatArea.scrollTop = chatArea.scrollHeight;
                 isViewingHistory = false;
@@ -6828,7 +6839,18 @@
                 chatArea.removeEventListener('wheel', stopFollowing);
                 chatArea.removeEventListener('touchstart', stopFollowing);
                 chatArea.removeEventListener('pointerdown', stopFollowing);
-                if (activeChatScrollCleanup === cleanup) activeChatScrollCleanup = null;
+                // 【本次修复：结束本次发送滚动时撤销事件监听，避免影响后续历史浏览】
+                if (forceUserSend) {
+                    window.removeEventListener('resize', retryUserScrollOnLayout);
+                    document.removeEventListener('visibilitychange', retryUserScrollOnLayout);
+                    window.removeEventListener('pageshow', retryUserScrollOnLayout);
+                    if (window.visualViewport) window.visualViewport.removeEventListener('resize', retryUserScrollOnLayout);
+                }
+                if (activeChatScrollCleanup === cleanup) {
+                    activeChatScrollCleanup = null;
+                    // 【本次修复：校准完成后解除用户强制跟随，恢复正常历史滑动及小箭头逻辑】
+                    userSendScrollFollowing = false;
+                }
             };
             activeChatScrollCleanup = cleanup;
 
@@ -6843,10 +6865,61 @@
                 resizeObserver.observe(chatArea);
                 if (observedMessage && observedMessage.isConnected) resizeObserver.observe(observedMessage);
             }
-            cleanupTimer = setTimeout(cleanup, 1600);
+            // 【本次修复：只有用户发送才延长校准窗口；后台/键盘恢复尺寸后补滚，不影响角色消息】
+            if (forceUserSend) {
+                window.addEventListener('resize', retryUserScrollOnLayout, { passive: true });
+                document.addEventListener('visibilitychange', retryUserScrollOnLayout);
+                window.addEventListener('pageshow', retryUserScrollOnLayout);
+                if (window.visualViewport) window.visualViewport.addEventListener('resize', retryUserScrollOnLayout, { passive: true });
+            }
+            cleanupTimer = setTimeout(cleanup, forceUserSend ? 3800 : 1600);
         }
 
         function isNearChatBottom() { return chatArea.scrollHeight - chatArea.scrollTop - chatArea.clientHeight < 44; }
+        // 【本次修改：iPhone 主屏幕 PWA 后台超过 5 分钟后回到前台，强制回到最新消息并退出浏览历史状态】
+        // 【本次修改：短时间后台返回仍尊重原先的历史浏览位置；不刷新网页、不重建消息、不影响角色消息规则】
+        const BACKGROUND_RESET_TO_LATEST_MS = 5 * 60 * 1000;
+        let backgroundChatScrollState = null;
+        let foregroundScrollRecoveryPending = false;
+        function rememberBackgroundChatScroll() {
+            // 【本次修改：隐藏与 pagehide 可能连续触发，首次离开时间必须保留，不能反复刷新计时】
+            if (backgroundChatScrollState) return;
+            const friend = getCurrentFriend();
+            if (!friend) return;
+            backgroundChatScrollState = {
+                friendId: friend.id,
+                wasAtLatest: chatArea.clientHeight > 0 && isNearChatBottom(),
+                leftAt: Date.now()
+            };
+        }
+        function recoverChatScrollOnForeground() {
+            if (document.hidden || !backgroundChatScrollState) return;
+            const state = backgroundChatScrollState;
+            backgroundChatScrollState = null;
+            const stayedAwayLong = Date.now() - state.leftAt >= BACKGROUND_RESET_TO_LATEST_MS;
+            // 【本次修改：后台满 5 分钟，无论离开前是否在浏览历史，回来都定位当前会话最新并清除历史浏览标记】
+            // 【本次修改：少于 5 分钟时仍只修复原本就在最新消息处的滚动，不打断短暂离开前的历史浏览】
+            if (!stayedAwayLong && (!state.wasAtLatest || appData.currentFriendId !== state.friendId)) return;
+            const targetFriendId = stayedAwayLong ? appData.currentFriendId : state.friendId;
+            foregroundScrollRecoveryPending = true;
+            isViewingHistory = false;
+            resetJumpLatestVisibility();
+            // 【本次修改：两帧后等聊天容器恢复可测量尺寸；长后台用同一滚动入口的强制补偿路径】
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+                foregroundScrollRecoveryPending = false;
+                if (document.hidden || appData.currentFriendId !== targetFriendId) return;
+                isViewingHistory = false;
+                scrollChatToLatest(targetFriendId, chatArea.lastElementChild, stayedAwayLong);
+            }));
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) rememberBackgroundChatScroll();
+            else recoverChatScrollOnForeground();
+        });
+        window.addEventListener('pagehide', rememberBackgroundChatScroll);
+        window.addEventListener('pageshow', recoverChatScrollOnForeground);
+        window.addEventListener('focus', recoverChatScrollOnForeground);
+
         // 【本次修改：小箭头沿用旧版两秒自动隐藏，不依赖历史100条分批加载】
         function resetJumpLatestVisibility() {
             clearTimeout(jumpLatestHideTimer);
@@ -6870,6 +6943,14 @@
         }
         // 【本次修改：普通历史滑动显示箭头；若是箭头发起的自动返回，则只负责隐藏】
         chatArea.addEventListener('scroll', () => {
+            // 【本次修改：后台布局变化/前台补滚动不属于用户主动浏览历史，避免误设 isViewingHistory】
+            if (document.hidden || foregroundScrollRecoveryPending) return;
+            // 【本次修复：用户新消息正在追到底时，忽略 Safari 延迟滚动/布局事件造成的历史状态误判】
+            if (userSendScrollFollowing) {
+                isViewingHistory = false;
+                resetJumpLatestVisibility();
+                return;
+            }
             isViewingHistory = !isNearChatBottom();
             if (jumpLatestReturningToBottom) {
                 resetJumpLatestVisibility();
