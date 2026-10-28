@@ -3606,6 +3606,9 @@
         .voice-small-btn{background:#111;color:#fff;border:0;border-radius:8px;padding:9px 12px;font-size:12px;cursor:pointer}
         .voice-small-btn:disabled{opacity:.45}
         .voice-minor-btn{border:1px solid var(--ios-divider);background:#fff;border-radius:7px;padding:6px 9px;font-size:11px;color:#444;flex-shrink:0}
+        /* 【本次修改】语音库删除按钮使用轻量红色提示，不影响其他设置页样式。 */
+        .voice-delete-btn{border:1px solid #e7b8b8;background:#fff;border-radius:7px;padding:6px 9px;font-size:11px;color:#b42323;flex-shrink:0}
+        .voice-delete-all-btn{border:1px solid #e7b8b8;background:#fff;color:#b42323;border-radius:8px;padding:8px 10px;font-size:12px;cursor:pointer}
         .voice-track-card{background:#fff;border:1px solid var(--ios-divider);border-radius:9px;padding:11px 10px;display:flex;gap:8px;align-items:center;margin-bottom:6px}
         .voice-track-main{min-width:0;flex:1}
         .voice-track-name{font-size:12px;font-weight:600;color:#222;overflow-wrap:anywhere}
@@ -4191,7 +4194,9 @@
               <input type="file" accept=".mp3,.m4a,audio/mpeg,audio/mp4" id="voiceReplaceFile" hidden>
             </div>
             <div class="voice-panel-section">
-              <div style="display:flex;align-items:center;justify-content:space-between"><h3>已导入语音</h3><span class="voice-muted" id="voiceTotal">0 条语音</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap"><h3>已导入语音</h3><span class="voice-muted" id="voiceTotal">0 条语音</span></div>
+              <!-- 【本次新增】一键删除当前角色语音库内的全部已导入音频。 -->
+              <div class="voice-actions"><button type="button" class="voice-delete-all-btn" id="voiceDeleteAllBtn">一键删除所有已导入的语音</button></div>
               <input type="search" class="voice-field" id="voiceLibraryFilter" placeholder="搜索 音频文件名或当前绑定的中文字卡">
               <div class="voice-muted">文件名在上；下面的“已绑定”文字显示目前的绑定关系。调整后这里会直接更新。</div>
               <div id="voiceLibraryList"></div><div id="voiceLibraryEmpty" class="voice-muted">还没有导入语音</div>
@@ -4622,15 +4627,54 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             const fragment = document.createDocumentFragment();
             list.slice(0, voiceLibraryVisibleCount).forEach(item => {
                 const row = document.createElement('div'); row.className = 'voice-track-card';
-                row.innerHTML = `<div class="voice-track-main"><div class="voice-track-name">${voiceEscape(item.filename)}</div><div class="voice-track-binding">${item.phraseId ? '已绑定：' + voiceEscape(voicePhraseText(item.phraseId)) : '未绑定'}</div></div><button type="button" class="voice-minor-btn voice-preview-btn">试听</button><button type="button" class="voice-minor-btn voice-manage-btn">调整</button>`;
+                // 【本次新增】每条已导入语音都可单独删除；删除元数据后，该字卡自动恢复“未绑定”。
+                row.innerHTML = `<div class="voice-track-main"><div class="voice-track-name">${voiceEscape(item.filename)}</div><div class="voice-track-binding">${item.phraseId ? '已绑定：' + voiceEscape(voicePhraseText(item.phraseId)) : '未绑定'}</div></div><button type="button" class="voice-minor-btn voice-preview-btn">试听</button><button type="button" class="voice-minor-btn voice-manage-btn">调整</button><button type="button" class="voice-delete-btn voice-delete-one-btn">删除</button>`;
                 row.querySelector('.voice-preview-btn').addEventListener('click', () => voicePreviewPlay(() => voiceReadTrack(item.id), 'stored:' + item.id, item.filename));
                 row.querySelector('.voice-manage-btn').addEventListener('click', () => voiceSelectSaved(item.id));
+                row.querySelector('.voice-delete-one-btn').addEventListener('click', () => voiceDeleteSavedTrack(item.id));
                 fragment.appendChild(row);
             });
             section.appendChild(fragment);
             voiceEl('voiceMoreRows').hidden = list.length <= voiceLibraryVisibleCount;
             voiceEl('voiceLibraryEmpty').hidden = list.length > 0;
             if (voiceActiveTrackId) voiceRenderActive();
+        }
+        // 【本次新增】单条删除：同步删除音频 Blob 与绑定元数据，删除后字卡自然恢复未绑定状态。
+        async function voiceDeleteSavedTrack(id) {
+            const item = voiceRows.find(row => row.id === id);
+            if (!item) return;
+            if (!confirm(`确定删除语音“${item.filename}”吗？删除后对应字卡将恢复为未绑定状态。`)) return;
+            try {
+                if (voicePreviewSource || voiceAudioPreview || voicePreviewURL) voiceStopPreview();
+                await voiceDeleteIds([id]);
+                if (voiceActiveTrackId === id) {
+                    voiceActiveTrackId = null;
+                    voiceEl('voiceManageSection').hidden = true;
+                }
+                await voiceRefreshRows();
+                voiceStatus('已删除该条语音；对应字卡已恢复未绑定状态。');
+            } catch (err) {
+                console.error('删除单条语音失败：', err);
+                voiceStatus('删除语音失败：' + err.message, true);
+            }
+        }
+        // 【本次新增】一键删除当前角色的全部导入语音；保留所有中文字卡，只清空音频和绑定。
+        async function voiceDeleteAllSavedTracks() {
+            const friendId = appData.currentFriendId;
+            const items = await voiceListForFriend(friendId);
+            if (!items.length) { voiceStatus('当前角色没有已导入的语音。'); return; }
+            if (!confirm(`确定删除当前角色的全部 ${items.length} 条已导入语音吗？此操作不可撤销，所有相关字卡都会恢复为未绑定状态。`)) return;
+            try {
+                voiceStopPreview();
+                await voiceDeleteIds(items.map(item => item.id));
+                voiceActiveTrackId = null;
+                voiceEl('voiceManageSection').hidden = true;
+                await voiceRefreshRows();
+                voiceStatus(`已删除全部 ${items.length} 条语音；所有字卡均已恢复未绑定状态。`);
+            } catch (err) {
+                console.error('删除全部语音失败：', err);
+                voiceStatus('删除全部语音失败：' + err.message, true);
+            }
         }
         function voiceSelectSaved(id) {
             voiceActiveTrackId = id;
@@ -4938,6 +4982,8 @@ https://github.com/nodeca/pako/blob/main/LICENSE
         voiceEl('voicePreviewFilter').addEventListener('input', () => { voicePreviewVisibleCount = 40; voiceRenderDraftPreview(); });
         voiceEl('voiceLibraryFilter').addEventListener('input', () => { voiceLibraryVisibleCount = 45; voiceRenderLibrary(); });
         voiceEl('voiceMoreRows').addEventListener('click', () => { voiceLibraryVisibleCount += 45; voiceRenderLibrary(); });
+        // 【本次新增】绑定“一键删除所有已导入语音”按钮。
+        voiceEl('voiceDeleteAllBtn').addEventListener('click', voiceDeleteAllSavedTracks);
         voiceEl('voiceMorePreview').addEventListener('click', () => { voicePreviewVisibleCount += 40; voiceRenderDraftPreview(); });
         voiceEl('voiceManageMove').addEventListener('click', () => { if (voiceActiveTrackId) voiceOpenTarget('saved', voiceActiveTrackId); });
         voiceEl('voiceManagePreview').addEventListener('click', () => { if (voiceActiveTrackId) voicePreviewPlay(() => voiceReadTrack(voiceActiveTrackId), 'stored:' + voiceActiveTrackId, voiceRows.find(v => v.id === voiceActiveTrackId)?.filename || 'audio.mp3'); });
