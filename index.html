@@ -6517,8 +6517,7 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             // 为每条回复创建内容
             const replies = [];
             for (let i = 0; i < replyCount; i++) {
-                const randomType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-                let replyContent = '';
+                // 【本次修改：只预留本轮消息条数，具体字卡/表情包等到每条真正发送时再抽取】
 
                 // 【本次修改：引用概率仍保持每条独立20%；触发后用户/角色双方权重严格一致】
                 let shouldQuote = false;
@@ -6546,18 +6545,9 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                     }
                 }
 
-                if (randomType === 'text') {
-                    const randomIndex = Math.floor(Math.random() * friend.settings.phrases.length);
-                    replyContent = friend.settings.phrases[randomIndex];
-                } else if (randomType === 'sticker') {
-                    const randomIndex = Math.floor(Math.random() * friend.settings.stickers.length);
-                    replyContent = friend.settings.stickers[randomIndex];
-                }
-
+                // 【本次修改：占位消息暂不生成 type/content，引用逻辑仍在原位置执行】
                 const botMessage = {
                     sender: 'bot',
-                    type: randomType,
-                    content: replyContent,
                     timestamp: Date.now() // 会在发送时更新为实际时间
                 };
 
@@ -6660,6 +6650,21 @@ https://github.com/nodeca/pako/blob/main/LICENSE
             }
 
             const reply = replies[messageIndex];
+
+            // 【本次修改：普通聊天每条消息发送前才独立放回抽取，原有引用概率与全部等待间隔不变】
+            const availableTypes = [];
+            if (friend.settings.phrases.length > 0) availableTypes.push('text');
+            if (friend.settings.stickers.length > 0) availableTypes.push('sticker');
+            if (availableTypes.length === 0) {
+                // 【本次修改：等待期间字卡/表情包被全部删空时，安全结束本轮任务】
+                replyTaskQueues[friendId].shift();
+                processReplyTaskQueue(friendId);
+                return;
+            }
+            const randomType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+            const randomIndex = Math.floor(Math.random() * (randomType === 'text' ? friend.settings.phrases.length : friend.settings.stickers.length));
+            reply.type = randomType;
+            reply.content = randomType === 'text' ? friend.settings.phrases[randomIndex] : friend.settings.stickers[randomIndex];
 
             // 添加时间戳
             reply.timestamp = Date.now();
