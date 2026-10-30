@@ -1887,10 +1887,10 @@
             background-color: #ff5252;
         }
 
-        /* 【本次修改：好友管理删除按钮改为低饱和豆沙色，避免原亮红色过于突兀；仅影响此按钮】 */
+        /* 【本次修改：只将设置页的删除好友按钮改为黑色，保留其余样式】 */
         .delete-friend-setting-btn {
             width: 100%;
-            background-color: #C9828C;
+            background-color: #000000;
             color: #ffffff;
             border: none;
             padding: 10px;
@@ -1900,8 +1900,9 @@
             transition: background-color 0.2s, opacity 0.2s;
         }
 
+        /* 【本次修改：删除好友按钮悬停时也保持黑色】 */
         .delete-friend-setting-btn:hover {
-            background-color: #B9747E;
+            background-color: #000000;
         }
 
         .delete-friend-setting-btn:active {
@@ -4071,7 +4072,7 @@
                         </label>
                     </div>
                     <div class="toggle-description">
-                        开启后，对方每次会回复1-5条随机消息；关闭后，对方每次只回复1条消息。
+                        开启后，对方每次会回复1-7条随机消息；关闭后，对方每次只回复1条消息。
                     </div>
                 </div>
 
@@ -6510,55 +6511,17 @@ https://github.com/nodeca/pako/blob/main/LICENSE
                 return [];
             }
 
-            // 主动发送时也使用批量发送设置
+            // 【本次修改：批量回复随机1-7条，主动发送沿用原有批量设置】
             const replyCount = friend.settings.multiMessageEnabled ?
-                Math.floor(Math.random() * 5) + 1 : 1;
+                Math.floor(Math.random() * 7) + 1 : 1;
 
-            // 为每条回复创建内容
+            // 【本次修改：只决定本轮条数并创建占位；引用与具体内容都在每条实际发送前抽取】
             const replies = [];
             for (let i = 0; i < replyCount; i++) {
-                // 【本次修改：只预留本轮消息条数，具体字卡/表情包等到每条真正发送时再抽取】
-
-                // 【本次修改：引用概率仍保持每条独立20%；触发后用户/角色双方权重严格一致】
-                let shouldQuote = false;
-                let quoteMessage = null;
-                if (friend.settings.enableQuoteReply && Math.random() < 0.2) {
-                    shouldQuote = true;
-
-                    // 【本次修改：双方各取最近10条可引用消息；先50/50选“用户或角色”，再在该侧随机一条】
-                    const recentUserMessages = friend.messages.filter(m =>
-                        m.sender === 'user' && m.type !== 'call_event' && m.type !== 'recall_event'
-                    ).slice(-10);
-                    const recentBotMessages = friend.messages.filter(m =>
-                        m.sender === 'bot' && m.type !== 'call_event' && m.type !== 'recall_event'
-                    ).slice(-10);
-
-                    let quotePool = [];
-                    if (recentUserMessages.length > 0 && recentBotMessages.length > 0) {
-                        quotePool = Math.random() < 0.5 ? recentUserMessages : recentBotMessages;
-                    } else {
-                        quotePool = recentUserMessages.length > 0 ? recentUserMessages : recentBotMessages;
-                    }
-
-                    if (quotePool.length > 0) {
-                        quoteMessage = quotePool[Math.floor(Math.random() * quotePool.length)];
-                    }
-                }
-
-                // 【本次修改：占位消息暂不生成 type/content，引用逻辑仍在原位置执行】
                 const botMessage = {
                     sender: 'bot',
                     timestamp: Date.now() // 会在发送时更新为实际时间
                 };
-
-                // 如果有引用，添加到消息中
-                if (quoteMessage && shouldQuote) {
-                    botMessage.quote = quoteMessage.content;
-                    botMessage.quoteType = quoteMessage.type;
-                    // 【本次修改：引用用户显示用户名称；引用角色自己的消息显示角色名称】
-                    botMessage.quoteSender = quoteMessage.sender === 'user' ? appData.userName : friend.name;
-                    botMessage.quoteTargetTimestamp = quoteMessage.timestamp;
-                }
 
                 replies.push(botMessage);
             }
@@ -6651,20 +6614,54 @@ https://github.com/nodeca/pako/blob/main/LICENSE
 
             const reply = replies[messageIndex];
 
-            // 【本次修改：普通聊天每条消息发送前才独立放回抽取，原有引用概率与全部等待间隔不变】
-            const availableTypes = [];
-            if (friend.settings.phrases.length > 0) availableTypes.push('text');
-            if (friend.settings.stickers.length > 0) availableTypes.push('sticker');
-            if (availableTypes.length === 0) {
-                // 【本次修改：等待期间字卡/表情包被全部删空时，安全结束本轮任务】
+            // 【本次修改：普通聊天每条实际发送前，才独立判断20%引用概率并临时选择引用目标】
+            let shouldQuote = false;
+            let quoteMessage = null;
+            if (friend.settings.enableQuoteReply && Math.random() < 0.2) {
+                shouldQuote = true;
+
+                // 【本次修改：保持原引用规则：双方各最近10条；双方都有时先等概率选发送者】
+                const recentUserMessages = friend.messages.filter(m =>
+                    m.sender === 'user' && m.type !== 'call_event' && m.type !== 'recall_event'
+                ).slice(-10);
+                const recentBotMessages = friend.messages.filter(m =>
+                    m.sender === 'bot' && m.type !== 'call_event' && m.type !== 'recall_event'
+                ).slice(-10);
+
+                let quotePool = [];
+                if (recentUserMessages.length > 0 && recentBotMessages.length > 0) {
+                    quotePool = Math.random() < 0.5 ? recentUserMessages : recentBotMessages;
+                } else {
+                    quotePool = recentUserMessages.length > 0 ? recentUserMessages : recentBotMessages;
+                }
+
+                if (quotePool.length > 0) {
+                    quoteMessage = quotePool[Math.floor(Math.random() * quotePool.length)];
+                }
+            }
+
+            // 【本次修改：仅改变引用判定时机；引用数据结构和显示规则不变】
+            if (quoteMessage && shouldQuote) {
+                reply.quote = quoteMessage.content;
+                reply.quoteType = quoteMessage.type;
+                reply.quoteSender = quoteMessage.sender === 'user' ? appData.userName : friend.name;
+                reply.quoteTargetTimestamp = quoteMessage.timestamp;
+            }
+
+            // 【本次修改：字卡与表情包合并为一个等权候选池，每张内容等概率、独立放回抽取】
+            const phraseCount = friend.settings.phrases.length;
+            const stickerCount = friend.settings.stickers.length;
+            if (phraseCount + stickerCount === 0) {
+                // 【本次修改：等待期间候选内容全部删空，仍按原逻辑安全结束任务】
                 replyTaskQueues[friendId].shift();
                 processReplyTaskQueue(friendId);
                 return;
             }
-            const randomType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-            const randomIndex = Math.floor(Math.random() * (randomType === 'text' ? friend.settings.phrases.length : friend.settings.stickers.length));
-            reply.type = randomType;
-            reply.content = randomType === 'text' ? friend.settings.phrases[randomIndex] : friend.settings.stickers[randomIndex];
+            const randomIndex = Math.floor(Math.random() * (phraseCount + stickerCount));
+            reply.type = randomIndex < phraseCount ? 'text' : 'sticker';
+            reply.content = randomIndex < phraseCount
+                ? friend.settings.phrases[randomIndex]
+                : friend.settings.stickers[randomIndex - phraseCount];
 
             // 添加时间戳
             reply.timestamp = Date.now();
